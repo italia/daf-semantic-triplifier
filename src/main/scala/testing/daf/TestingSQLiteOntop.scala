@@ -48,6 +48,22 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.util.Random
 import org.sqlite.Function
+import it.unibz.inf.ontop.r2rml.R2RMLManager
+import org.semanticweb.owlapi.model.OWLDocumentFormat
+import org.semanticweb.owlapi.formats.TurtleDocumentFormat
+import it.unibz.inf.ontop.model.OBDAModel
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import it.unibz.inf.ontop.r2rml.R2RMLParser
+import it.unibz.inf.ontop.r2rml.R2RMLReader
+import it.unibz.inf.ontop.r2rml.OBDAMappingTransformer
+import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory
+import org.openrdf.model.impl.TreeModel
+import it.unibz.inf.ontop.owlapi.bootstrapping.DirectMappingBootstrapper
+import it.unibz.inf.ontop.r2rml.R2RMLWriter
+import eu.optique.api.mapping.impl.R2RMLUtil
 
 object MainOntopSQlite extends App {
 
@@ -60,6 +76,20 @@ object MainOntopSQlite extends App {
   val dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
   val usr = "aserafini"
   val pwd = "openD4ti"
+
+  // -------------------------------------------------------------------------------
+  // TESTING DirectMapping
+
+  val dm_boot = new DirectMappingBootstrapper(
+    "test://w3id.org/italia/onto/",
+    dsn,
+    usr, pwd,
+    db_driver)
+
+  val dm_onto: OWLOntology = dm_boot.getOntology
+  dm_onto.saveOntology(new TurtleDocumentFormat, System.err)
+
+  // TODO: save R2RML ?
 
   // -------------------------------------------------------------------------------
 
@@ -137,7 +167,7 @@ object MainOntopSQlite extends App {
     val collector = new StatementCollector(r2rmlModel);
     rdfParser.setRDFHandler(collector);
     val fis = new FileInputStream(new File(r2rmlFile));
-    rdfParser.parse(fis, "http://example.org");
+    rdfParser.parse(fis, "test://example.org");
     r2rmlModel
   }
 
