@@ -1,0 +1,14 @@
+
+# eclipse
+.project
+.classpath
+.cache-main
+.cache-tests
+.settings/
+
+bin/
+target/
+
+*.class
+*~
+
