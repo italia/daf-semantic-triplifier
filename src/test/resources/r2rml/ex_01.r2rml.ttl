@@ -13,6 +13,7 @@
 				"id" AS "id_comune", 
 				ISTAT.codice_comune_formato_alfanumerico AS "_alfa",
 				ANPR.denominazione_it,
+				ISTAT.codice_nuts3_2006 AS "nuts3",
 				UPPER(SUBSTR(ANPR.denominazione_it, 1, 1))||SUBSTR(LOWER(ANPR.denominazione_it), 2) AS "_altro"
 				
 			FROM 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni' AS ANPR 
@@ -26,19 +27,24 @@
 	rr:subjectMap [ rr:template "http://w3id.org/italia/resources/comuni/{'id_comune'}"] ;
 	
 	rr:predicateObjectMap [ 
-	  rr:predicate     ex:codice ; 
-	  rr:objectMap    [ rr:column "_alfa"]
+	  rr:predicate ex:codice ; 
+	  rr:objectMap [ rr:column "_alfa"]
 	] ;
 	
 	rr:predicateObjectMap [ 
-	  rr:predicate     ex:denominazione ; 
-	  rr:objectMap    [ rr:column "ANPR.denominazione_it"]
+	  rr:predicate ex:denominazione ; 
+	  rr:objectMap [ rr:column "ANPR.denominazione_it"]
 	] ;
 	
 	rr:predicateObjectMap [ 
-	  rr:predicate     ex:denominazione_corretta ; 
-	  rr:objectMap    [ rr:column "_altro"]
+	  rr:predicate ex:denominazione_corretta ; 
+	  rr:objectMap [ rr:column "_altro"]
 	] ;
-    
-    
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate ex:link_nuts ; 
+	  rr:predicate ex:employee;
+	  rr:objectMap [ rr:template "http://nuts.geovocab.org/id/{nuts3}" ];
+	] ;
+	    
  .
