@@ -1,4 +1,4 @@
-package other
+package testing.daf
 import it.unibz.inf.ontop.owlrefplatform.core.QuestConstants;
 import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences;
 import it.unibz.inf.ontop.sesame.RepositoryConnection;
@@ -43,15 +43,22 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.charset.Charset
 
-object MainOntopSQlite extends App {
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+
+///**
+// * CHECK:
+// * Exception in thread "main" java.sql.SQLException: [Simba][ImpalaJDBCDriver](500164) Error initialized or created transport for authentication: null.
+// */
+object MainOntopSesameWithImpala extends App {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  val db_driver = "org.sqlite.JDBC"
-  val db_name = "daf_comuni_test"
+  val db_driver = "com.cloudera.impala.jdbc41.Driver"
+  val db_name = "opendata.roma_o_incidenti_d_stradali"
   Class.forName(db_driver)
 
-  val dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+  val dsn = "jdbc:impala://slave4.platform.daf.gov.it:21050;SSL=1;SSLKeyStore=C:/Users/Al.Serafini/awavedev/progetti/DAF/ssl_impala/master-impala.jks;SSLKeyStorePwd=Ahdai5th;AuthMech=3;CAIssuedCertNamesMismatch=1"
   val usr = "aserafini"
   val pwd = "openD4ti"
 
@@ -107,6 +114,11 @@ object MainOntopSQlite extends App {
   conn.close()
 
   repo.shutDown()
+  
+  
+  val dump = Files.readAllLines(output_file.toPath()).slice(0, 100).mkString("\n")
+  println("\n\n\n\nRDF DUMP")
+  println(dump)
 
   System.exit(0)
 

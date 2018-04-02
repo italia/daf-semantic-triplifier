@@ -1,3 +1,4 @@
+package testing.daf;
 //package examples
 //
 //import it.unibz.inf.ontop.rdf4j.repository.OntopRepository;

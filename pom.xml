@@ -105,16 +105,16 @@
 			<groupId>it.unibz.inf.ontop</groupId>
 			<artifactId>ontop-quest-sesame</artifactId>
 			<version>1.18.1</version>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>eu.optique-project</groupId> -->
-<!-- 					<artifactId>r2rml-api</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>com.github.jsqlparser</groupId> -->
-<!-- 					<artifactId>jsqlparser</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
+			<!-- <exclusions> -->
+			<!-- <exclusion> -->
+			<!-- <groupId>eu.optique-project</groupId> -->
+			<!-- <artifactId>r2rml-api</artifactId> -->
+			<!-- </exclusion> -->
+			<!-- <exclusion> -->
+			<!-- <groupId>com.github.jsqlparser</groupId> -->
+			<!-- <artifactId>jsqlparser</artifactId> -->
+			<!-- </exclusion> -->
+			<!-- </exclusions> -->
 			<exclusions>
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
@@ -130,13 +130,33 @@
 			<groupId>it.unibz.inf.ontop</groupId>
 			<artifactId>ontop-obdalib-r2rml</artifactId>
 			<version>1.18.1</version>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>eu.optique-project</groupId> -->
-<!-- 					<artifactId>r2rml-api</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
+			<!-- <exclusions> -->
+			<!-- <exclusion> -->
+			<!-- <groupId>eu.optique-project</groupId> -->
+			<!-- <artifactId>r2rml-api</artifactId> -->
+			<!-- </exclusion> -->
+			<!-- </exclusions> -->
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/eu.optique-project/r2rml-api -->
+		<dependency>
+			<groupId>eu.optique-project</groupId>
+			<artifactId>r2rml-api</artifactId>
+			<version>0.4.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/eu.optique-project/r2rml-api-core -->
+		<dependency>
+			<groupId>eu.optique-project</groupId>
+			<artifactId>r2rml-api-core</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/eu.optique-project/r2rml-api-rdf4j-binding -->
+		<dependency>
+			<groupId>eu.optique-project</groupId>
+			<artifactId>r2rml-api-rdf4j-binding</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+
 
 
 		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->

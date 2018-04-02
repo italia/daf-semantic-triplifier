@@ -1,0 +1,44 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix ex: <http://example.com/ns#>.
+
+@prefix cmn: <http://w3id.org/italia/resources/comuni/> .
+
+
+<TriplesMap1> a rr:TriplesMapClass ;
+	
+	rr:logicalTable [
+		rr:sqlQuery """
+		
+			SELECT 
+				"id" AS "id_comune", 
+				ISTAT.codice_comune_formato_alfanumerico AS "_alfa",
+				ANPR.denominazione_it,
+				UPPER(SUBSTR(ANPR.denominazione_it, 1, 1))||SUBSTR(LOWER(ANPR.denominazione_it), 2) AS "_altro"
+				
+			FROM 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni' AS ANPR 
+			LEFT JOIN 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+			ON (ANPR.codistat=ISTAT.codice_comune_formato_alfanumerico)
+			
+				 
+		"""
+	] ;
+	
+	rr:subjectMap [ rr:template "http://w3id.org/italia/resources/comuni/{'id_comune'}"] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate     ex:codice ; 
+	  rr:objectMap    [ rr:column "_alfa"]
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate     ex:denominazione ; 
+	  rr:objectMap    [ rr:column "ANPR.denominazione_it"]
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate     ex:denominazione_corretta ; 
+	  rr:objectMap    [ rr:column "_altro"]
+	] ;
+    
+    
+ .

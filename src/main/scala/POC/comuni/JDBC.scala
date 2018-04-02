@@ -8,10 +8,11 @@ import com.typesafe.config.ConfigFactory
 import scala.util.Properties
 import java.util.Properties
 import java.sql.DriverManager
+import org.sqlite.Function
 
 object JDBC {
 
-  def apply(conf:JDBCConfig = JDBCConfig.DEFAULT) = new JDBC(conf)
+  def apply(conf: JDBCConfig = JDBCConfig.DEFAULT) = new JDBC(conf)
 
 }
 
@@ -28,6 +29,9 @@ class JDBC(conf: JDBCConfig) {
 
     val prps = new Properties
     val conn = DriverManager.getConnection(conf.dsn, prps)
+
+    // register SQlite UDF
+    // Function.create(conn, "normalize", new SQLiteUDFs.normalize())
 
     // TODO: use a connection pool!
     conns = List(conn)
@@ -114,5 +118,19 @@ object JDBCConfig {
     conf.getString("password"))
 
 }
-  
+
+object SQLiteUDFs {
+
+  class normalize extends Function {
+
+    override def xFunc() {
+
+      val txt = value_text(0).head.toUpper + value_text(0).tail.toLowerCase()
+      println(txt)
+      result(txt)
+
+    }
+  }
+
+}
   
