@@ -59,26 +59,13 @@ import it.unibz.inf.ontop.r2rml.R2RMLParser
 import it.unibz.inf.ontop.r2rml.R2RMLReader
 import it.unibz.inf.ontop.r2rml.OBDAMappingTransformer
 import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory
 import org.openrdf.model.impl.TreeModel
 import it.unibz.inf.ontop.owlapi.bootstrapping.DirectMappingBootstrapper
 import it.unibz.inf.ontop.r2rml.R2RMLWriter
 import eu.optique.api.mapping.impl.R2RMLUtil
-import org.openrdf.rio.turtle.TurtleWriter
-import org.eclipse.rdf4j.query.resultio.QueryResultIO
-import org.openrdf.rio.RioSetting
-import org.openrdf.rio.WriterConfig
-import org.openrdf.rio.helpers.BasicWriterSettings
 
-import java.lang.{ Boolean => JBoolean }
-import org.openrdf.query.resultio.BasicQueryWriterSettings
-import org.openrdf.rio.helpers.XMLWriterSettings
-import org.openrdf.model.Resource
-import org.openrdf.model.impl.ValueFactoryBase
-import org.openrdf.model.impl.ValueFactoryImpl
-import info.aduna.iteration.Iteration
-import info.aduna.iteration.Iterations
-
-object TestingSQLiteOntop extends App {
+object MainOntopSQlite extends App {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -100,14 +87,13 @@ object TestingSQLiteOntop extends App {
     db_driver)
 
   val dm_onto: OWLOntology = dm_boot.getOntology
-  //  dm_onto.saveOntology(new TurtleDocumentFormat, System.err)
+  dm_onto.saveOntology(new TurtleDocumentFormat, System.err)
 
   // TODO: save R2RML ?
 
   // -------------------------------------------------------------------------------
 
-  val dump_file = "target/EXPORT/regioni.ttl"
-  val r2rmlFile = new File("src/test/resources/r2rml/poc_regioni.r2rml.ttl").getAbsoluteFile;
+  val r2rmlFile = new File("src/test/resources/r2rml/ex_01.r2rml.ttl").getAbsoluteFile;
 
   val r2rmlModel = loadR2RML(r2rmlFile.toString());
 
@@ -127,7 +113,7 @@ object TestingSQLiteOntop extends App {
   // needed for Impala SQL
   preferences.setCurrentValueOf(QuestPreferences.SQL_GENERATE_REPLACE, "false");
 
-  println("\n\n#### RDF mapping - START")
+  println("starting...")
 
   val start_time = LocalDateTime.now()
 
@@ -137,41 +123,11 @@ object TestingSQLiteOntop extends App {
 
   val conn: RepositoryConnection = repo.getConnection()
 
-  val statements = Iterations.asList(conn.getStatements(null, null, null, true))
-    .toStream
-    .distinct.sortBy(_.getSubject.stringValue())
-
-  val output_file = new File(dump_file).getAbsoluteFile
+  val statements = conn.getStatements(null, null, null, false).asList()
+  val output_file = new File("target/EXPORT/testing_rdf.sqlite.nt").getAbsoluteFile
   if (!output_file.getParentFile.exists()) output_file.getParentFile.mkdirs()
   val fos = new FileOutputStream(output_file)
-  val format = Rio.getParserFormatForFileName(output_file.getName)
-
-  //  Rio.write(statements, fos, format)
-  //  Rio.write(statements, fos, format, config)
-
-  // CUSTOM TURTLE WRITER (PRETTY-PRINT)
-  val rdf_writer = new TurtleWriter(fos) {
-
-    val config = new WriterConfig
-    config.set[JBoolean](BasicWriterSettings.PRETTY_PRINT, true)
-    config.set[JBoolean](BasicWriterSettings.XSD_STRING_TO_PLAIN_LITERAL, true)
-    config.set[JBoolean](BasicWriterSettings.RDF_LANGSTRING_TO_LANG_LITERAL, true)
-    config.set[JBoolean](BasicQueryWriterSettings.ADD_SESAME_QNAME, false)
-    config.set[JBoolean](XMLWriterSettings.INCLUDE_ROOT_RDF_TAG, true)
-    config.set[JBoolean](BasicWriterSettings.RDF_LANGSTRING_TO_LANG_LITERAL, true)
-    config.set[JBoolean](BasicWriterSettings.XSD_STRING_TO_PLAIN_LITERAL, true)
-
-    this.handleNamespace("l0", "https://w3id.org/italia/onto/l0/")
-    this.handleNamespace("clvapit", "https://w3id.org/italia/onto/CLV/")
-    this.handleNamespace("regions", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/")
-    this.handleNamespace("identifiers", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
-    this.handleNamespace("countries", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/")
-
-    this.setWriterConfig(config)
-
-  }
-  Rio.write(statements, rdf_writer)
-
+  Rio.write(statements, fos, RDFFormat.NTRIPLES)
   fos.close()
 
   val end_time = LocalDateTime.now()
@@ -187,12 +143,9 @@ object TestingSQLiteOntop extends App {
 
   val dump = Files.readAllLines(output_file.toPath())
     .zipWithIndex.map(_.swap)
-    .map(x => s"${x._1}\t${x._2}")
     .slice(Random.nextInt(100), Random.nextInt(500)).mkString("\n")
   println("\n\n\n\nRDF DUMP")
   println(dump)
-
-  println("#### RDF mapping - STOP")
 
   System.exit(0)
 
@@ -214,7 +167,7 @@ object TestingSQLiteOntop extends App {
     val collector = new StatementCollector(r2rmlModel);
     rdfParser.setRDFHandler(collector);
     val fis = new FileInputStream(new File(r2rmlFile));
-    rdfParser.parse(fis, "test://mapping");
+    rdfParser.parse(fis, "test://example.org");
     r2rmlModel
   }
 
