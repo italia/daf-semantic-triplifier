@@ -1,0 +1,140 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+
+@base  <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/> .
+
+<VIEW_comuni> rr:sqlQuery """
+		
+	SELECT DISTINCT 
+	ANPR.codistat AS "__CITY_CODE", 
+	ANPR.denominazione_it AS "__CITY_NAME",
+	SUBSTR('00'||ISTAT.codice_regione, -2, 2) AS "__REGION_CODE",
+	ISTAT.denominazione_regione AS "__REGION_NAME",
+	LOWER(REPLACE(ISTAT.denominazione_regione, " ", "-")) AS "__REGION_ID",
+	SUBSTR('00'||ISTAT.codice_provincia, -2, 2) AS "__PROVINCE_CODE",
+	ISTAT.sigla_automobilistica AS "__PROVINCE_ID", 
+	SUBSTR(ANPR.dataistituzione,7) || '' || SUBSTR(ANPR.dataistituzione,4,2) || '' || SUBSTR(ANPR.dataistituzione,1,2) AS "__DATE_START",
+	SUBSTR(ANPR.datacessazione,7) || '' || SUBSTR(ANPR.datacessazione,4,2) || '' || SUBSTR(ANPR.datacessazione,1,2) AS "__DATE_STOP"
+	FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT 
+	JOIN 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni' AS ANPR 
+	ON (ANPR.codistat=ISTAT.codice_comune_formato_alfanumerico)
+		 
+"""
+.
+
+<TriplesMap_City> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_comuni> ;
+	
+	rr:subjectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{__DATE_START}-{'__CITY_CODE'}" ;
+		rr:class skos:Concept, clvapit:City, clvapit:Feature, clvapit:AddressComponent, clvapit:NamedAddressComponent ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:name ; 
+	  rr:objectMap [ rr:column "__CITY_NAME" ; rr:language "it" ]
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:situatedWithin ; 
+	  rr:objectMap [ rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'__PROVINCE_ID'}"  ]
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:start_date ; 
+	  rr:objectMap [ 
+	  	rr:column "__DATE_START" ; 
+	  	rr:termType rr:Literal ;
+        # rr:datatype xsd:string ;
+	  ]
+	] ;
+	    
+ 	# rr:predicateObjectMap [ 
+	#   rr:predicate clvapit:hasIdentifier ; 
+	#   rr:objectMap [
+	#  	 rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/identifiers/cc-{'__PROVINCE_CODE'}" ;
+	#    rr:termType rr:IRI ;
+	#   ] 
+	# ] ;
+		
+ .
+ 
+ # TODO: IDENTIFIERS
+ # TODO: DCAT metadata
+ # TODO: ConceptScheme
+ 
+<TriplesMap_Province> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_comuni> ;
+	
+	rr:subjectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'__PROVINCE_ID'}" ;
+		rr:class skos:Concept, clvapit:Province, clvapit:Feature, clvapit:AddressComponent, clvapit:NamedAddressComponent ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:name ; 
+	  rr:objectMap [ rr:column "__PROVINCE_ID" ; rr:language "it" ]
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:situatedWithin ; 
+	  rr:objectMap [ rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'__REGION_CODE'}"  ]
+	] ;
+	
+ 	# rr:predicateObjectMap [ 
+	#   rr:predicate clvapit:hasIdentifier ; 
+	#   rr:objectMap [
+	#  	 rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/identifiers/cr-{'__PROVINCE_CODE'}" ;
+	#    rr:termType rr:IRI ;
+	#   ] 
+	# ] ;
+		
+ .
+ 
+
+
+
+
+[] rdfs:comment """
+
+TODO 
+clvapit:hasIdentifier   <http://dati.gov.it/Resource/Identifier/regione_8> ;
+ 
+NUTS 0: countries
+NUTS 1: major socio-economic regions
+NUTS 2: basic regions for the application of regional policies
+NUTS 3: as small regions for specific diagnoses
+
+
+
+SELECT 
+	ANPR.denominazione_it,
+	LOWER(REPLACE(ANPR.denominazione_it, " ", "_")) AS "_ID_COMUNE",
+	ISTAT.codice_comune_formato_alfanumerico AS "_alfa",
+	ISTAT.denominazione_regione,
+	LOWER(REPLACE(ISTAT.denominazione_regione, " ", "_")) AS "_ID_REGIONE",
+	LOWER(REPLACE(ISTAT.denominazione_provincia, " ", "_")) AS "_ID_PROVINCIA",
+	LOWER(REPLACE(ISTAT.denominazione_citta_metropolitana, " ", "_")) AS "_ID_CITTA_METROPOLITANA",
+	SUBSTR(ANPR.dataistituzione,7)||'/'||substr(ANPR.dataistituzione,4,2)||'/'||substr(ANPR.dataistituzione,1,2) AS "_DATA_START",
+	SUBSTR(ANPR.datacessazione,7)||'/'||substr(ANPR.datacessazione,4,2)||'/'||substr(ANPR.datacessazione,1,2) AS "_DATA_STOP"
+	
+FROM 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni' AS ANPR 
+JOIN 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+ON (ANPR.codistat=ISTAT.codice_comune_formato_alfanumerico)
+
+-- LIMIT 100 OFFSET 333
+
+/*
+CAPITALIZATION EXAMPLE! 
+UPPER(SUBSTR(ANPR.denominazione_it, 1, 1))||SUBSTR(LOWER(ANPR.denominazione_it), 2) AS "_altro"
+*/
+
+"""
+ 
+.

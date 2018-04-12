@@ -1,4 +1,6 @@
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
 @prefix l0: <https://w3id.org/italia/onto/l0/> .
 @prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
 
@@ -24,7 +26,7 @@
 	
 	rr:subjectMap [ 
 		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'__REGION_CODE'}" ;
-		rr:class clvapit:Region, clvapit:Feature , clvapit:AddressComponent , clvapit:NamedAddressComponent ;
+		rr:class skos:Concept, clvapit:Region, clvapit:Feature, clvapit:AddressComponent, clvapit:NamedAddressComponent ;
 	] ;
 	
 	rr:predicateObjectMap [ 

@@ -139,7 +139,9 @@ object TestingSQLiteOntop extends App {
 
   val statements = Iterations.asList(conn.getStatements(null, null, null, true))
     .toStream
-    .distinct.sortBy(_.getSubject.stringValue())
+    .distinct
+    // .sortBy(_.getSubject.stringValue())
+    .sortWith((st1, st2) => st1.toString().compareTo(st2.toString()) < 0)
 
   val output_file = new File(dump_file).getAbsoluteFile
   if (!output_file.getParentFile.exists()) output_file.getParentFile.mkdirs()
@@ -161,11 +163,14 @@ object TestingSQLiteOntop extends App {
     config.set[JBoolean](BasicWriterSettings.RDF_LANGSTRING_TO_LANG_LITERAL, true)
     config.set[JBoolean](BasicWriterSettings.XSD_STRING_TO_PLAIN_LITERAL, true)
 
+    this.handleNamespace("skos", "http://www.w3.org/2004/02/skos/core#")
     this.handleNamespace("l0", "https://w3id.org/italia/onto/l0/")
     this.handleNamespace("clvapit", "https://w3id.org/italia/onto/CLV/")
-    this.handleNamespace("regions", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/")
-    this.handleNamespace("identifiers", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
     this.handleNamespace("countries", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/")
+    this.handleNamespace("regions", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/")
+    this.handleNamespace("provinces", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/")
+    this.handleNamespace("cities", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/")
+    this.handleNamespace("identifiers", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
 
     this.setWriterConfig(config)
 
