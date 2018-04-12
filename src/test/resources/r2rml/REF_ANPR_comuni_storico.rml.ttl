@@ -1,0 +1,251 @@
+@prefix rr:     <http://www.w3.org/ns/r2rml#>.
+@prefix rml:    <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:     <http://semweb.mmlab.be/ns/ql#> .
+@prefix csvw:   <http://www.w3.org/ns/csvw#>.
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix person: <http://www.w3.org/ns/person#>.
+@prefix adms:   <http://www.w3.org/ns/adms#>.
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:<http://purl.org/dc/terms/> .
+@prefix adms:   <http://www.w3.org/ns/adms#>.
+@prefix schema: <http://schema.org/>.
+@prefix dbpedia: <http://dbpedia.org/ontology/> .
+@prefix time:   <http://www.w3.org/2006/time#> .
+@prefix ex:     <http://example.org/#> .
+@prefix clvapit: <http://dati.gov.it/onto/clvapit#> .
+
+@base <http://dati.gov.it/data/anpr/> .
+
+<#csv_source_20170714> a csvw:Table;
+	#csvw:url "http://localhost:7777/ANPR/tabella%203%20archivio%20comuni%2020170714.csv" ;
+	csvw:url "http://localhost:7777/ANPR/comuni.csv" ;
+	csvw:dialect [
+		a csvw:Dialect ;
+		csvw:delimiter ";" ;
+		csvw:encoding "UTF-8" ;
+		csvw:header "1"^^xsd:boolean ;
+		csvw:headerRowCount "1"^^xsd:nonNegativeInteger ;
+		csvw:trim "1"^^xsd:boolean ;
+	] ;
+.
+
+# <#ex_local_csv> rml:logicalSource [
+# 	rml:source "C:/Users/Al.Serafini/repos/datasets/DATA/ANPR/tabella 3 archivio comuni 20170413.csv" ;
+# 	rml:referenceFormulation ql:CSV 
+# ]  ;
+# . 
+
+
+<#Comune>
+
+
+rml:logicalSource [
+	rml:referenceFormulation ql:CSV ;
+	rml:source <#csv_source_20170714> ;
+] ;
+
+rr:subjectMap [
+	rr:template "http://dati.gov.it/data/anpr/comuni/{CODCATASTALE}" ;
+	rr:class clvapit:City, skos:Concept
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate skos:notation ;
+	rr:objectMap [
+		rml:reference "CODCATASTALE" ;
+		rr:datatype xsd:string ;
+	]
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate clvapit:name, rdfs:label, skos:prefLabel ;
+	rr:objectMap [
+		rml:reference "DENOMINAZIONE_IT" ;
+		rr:datatype xsd:string
+	]
+] ;	
+
+rr:predicateObjectMap [
+	rr:predicate skos:altLabel ;
+	rr:objectMap [
+		rml:reference "ALTRADENOMINAZIONE" ;
+		rr:datatype xsd:string
+	]
+] ;	
+rr:predicateObjectMap [
+	rr:predicate skos:hiddenLabel ;
+	rr:objectMap [
+		rml:reference "DENOMTRASLITTERATA" ;
+		rr:datatype xsd:string
+	]
+] ;
+rr:predicateObjectMap [
+	rr:predicate skos:hiddenLabel ;
+	rr:objectMap [
+		rml:reference "ALTRADENOMTRASLITTERATA" ;
+		rr:datatype xsd:string
+	]
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate clvapit:hasCensusSection ;
+	rr:objectMap [
+		rr:template "http://dati.gov.it/data/anpr/prefetture/{IDPREFETTURA}" ;
+	]
+] ;
+
+# CHECK: verificare se hasProvince sia applicabile direttamente a City, o serve Address
+rr:predicateObjectMap [
+	rr:predicate clvapit:hasProvince, clvapit:clvapit:situatedWithin ;
+	rr:objectMap [
+		rr:template "http://dati.gov.it/data/anpr/province/{SIGLAPROVINCIA}" ;
+	]
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate clvapit:atTime ;
+	rr:objectMap [
+		rr:template "http://dati.gov.it/data/anpr/intervals/{DATAISTITUZIONE}-{DATACESSAZIONE}" ;
+	]
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate clvapit:hasIdentifier ;
+	rr:objectMap [
+		rr:template "http://dati.gov.it/data/anpr/identifiers/{CODISTAT}" ;
+	]
+] ;
+
+.
+
+
+<#Provincia>
+
+rml:logicalSource [
+	rml:referenceFormulation ql:CSV ;
+	rml:source <#csv_source_20170714> ;
+] ;
+rr:subjectMap [
+	rr:template "http://dati.gov.it/data/anpr/province/{SIGLAPROVINCIA}" ;
+	rr:class clvapit:Province
+] ;
+rr:predicateObjectMap [
+	rr:predicate clvapit:acronym ;
+	rr:objectMap [
+		rml:reference "SIGLAPROVINCIA" ;
+		rr:datatype xsd:string
+	]
+] ;
+
+.
+
+
+<#Prefettura>
+
+rml:logicalSource [
+	rml:referenceFormulation ql:CSV ;
+	rml:source <#csv_source_20170714> ;
+] ;
+rr:subjectMap [
+	rr:template "http://dati.gov.it/data/anpr/prefetture/{IDPREFETTURA}" ;
+	rr:class clvapit:CensusSection
+] ;
+rr:predicateObjectMap [
+	rr:predicate skos:notation ;
+	rr:objectMap [
+		rml:reference "IDPREFETTURA" ;
+		rr:datatype xsd:string
+	]
+] ;
+
+.
+
+
+<#Identificativo>
+
+rml:logicalSource [
+	rml:referenceFormulation ql:CSV ;
+	rml:source <#csv_source_20170714> ;
+] ;
+rr:subjectMap [
+	rr:template "http://dati.gov.it/data/anpr/identifiers/{CODISTAT}" ;
+	rr:class clvapit:Identifier
+] ;
+rr:predicateObjectMap [
+	rr:predicate clvapit:identifier ;
+	rr:objectMap [
+		rml:reference "CODISTAT" ;
+		rr:datatype xsd:string
+	]
+] ;
+
+.
+
+
+<#CoordinateTemporali>
+
+rml:logicalSource [
+	rml:referenceFormulation ql:CSV ;
+	rml:source <#csv_source_20170714> ;
+] ;
+
+rr:subjectMap [
+	rr:template "http://dati.gov.it/data/anpr/intervals/{DATAISTITUZIONE}-{DATACESSAZIONE}" ;
+ 	rr:class clvapit:TimeInterval ;
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate clvapit:startTime ;
+	rr:objectMap [
+		rml:reference "DATAISTITUZIONE" ;
+		rr:datatype xsd:dateTime
+	]
+] ;
+rr:predicateObjectMap [
+	rr:predicate clvapit:endTime ;
+	rr:objectMap [
+		rml:reference "DATACESSAZIONE" ;
+		rr:datatype xsd:dateTime
+	]
+] ;
+rr:predicateObjectMap [
+	rr:predicate clvapit:modified ;
+	rr:objectMap [
+		rml:reference "DATAULTIMOAGG" ;
+		rr:datatype xsd:dateTime
+	]
+] ;
+
+.
+
+
+<#Indirizzi>
+
+rml:logicalSource [
+	rml:referenceFormulation ql:CSV ;
+	rml:source <#csv_source_20170714> ;
+] ;
+
+rr:subjectMap [
+	rr:termType rr:BlankNode ;
+	rr:class clvapit:Address ;
+] ;
+
+rr:predicateObjectMap [
+	rr:predicate clvapit:hasCity ;
+	rr:objectMap [
+		rr:template "http://dati.gov.it/data/anpr/comuni/{CODCATASTALE}" ;
+	]
+] ;
+rr:predicateObjectMap [
+	rr:predicate clvapit:hasProvince ;
+	rr:objectMap [
+		rr:template "http://dati.gov.it/data/anpr/province/{SIGLAPROVINCIA}" ;
+	]
+] ;
+
+.
+
+
+
