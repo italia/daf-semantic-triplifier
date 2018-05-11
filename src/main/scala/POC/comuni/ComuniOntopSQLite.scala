@@ -1,4 +1,5 @@
-package testing.daf
+package POC.comuni
+
 import it.unibz.inf.ontop.owlrefplatform.core.QuestConstants;
 
 import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences;
@@ -64,6 +65,8 @@ import org.openrdf.model.impl.TreeModel
 import it.unibz.inf.ontop.owlapi.bootstrapping.DirectMappingBootstrapper
 import it.unibz.inf.ontop.r2rml.R2RMLWriter
 import eu.optique.api.mapping.impl.R2RMLUtil
+import org.openrdf.repository.sparql.SPARQLRepository
+import scala.util.Try
 
 object MainOntopSQlite extends App {
 
@@ -147,6 +150,19 @@ object MainOntopSQlite extends App {
   println("\n\n\n\nRDF DUMP")
   println(dump)
 
+  //  ---- LOAD TRIPLES into TRIPLESTORE ----
+  try {
+    val baseURI = "http://w3id.org/italia/data/"
+    val context = s"http://w3id.org/italia/dataset/${r2rmlFile.getName}"
+    val endpoint = "http://localhost:9999/blazegraph/sparql"
+    Triplestore.load(endpoint, r2rmlFile, context)
+  } catch {
+    case err: Exception => System.err.println("\n\nWARNING: cannot load data!\n" + err.getMessage)
+  }
+
+  // TODO: parameters injection
+  // TODO: add static RDF to dump (for metadata)
+
   System.exit(0)
 
   // ---------------------------------------
@@ -179,5 +195,72 @@ object MainOntopSQlite extends App {
   }
 }
 
+object Triplestore {
 
+  def apply(endpoint: String) = new Triplestore(endpoint, endpoint)
+
+  def load(endpoint: String, r2rmlFile: File, context: String) = new Triplestore(endpoint, endpoint).loadGraph(r2rmlFile, context, "", true)
+
+}
+
+class Triplestore(endpointQuery: String, endpointUpdate: String) {
+
+  private val logger = LoggerFactory.getLogger(this.getClass)
+
+  def loadGraph(
+    r2rmlFile: File,
+    context:   String,
+    baseURI:   String  = "",
+    clear:     Boolean = true) {
+
+    val triplestore = new SPARQLRepository(endpointQuery, endpointUpdate)
+    triplestore.initialize()
+
+    val tconn = triplestore.getConnection
+
+    val rdf_dump = s"${r2rmlFile.toURI().toURL()}"
+    logger.debug(s"loading rdf dump: ${r2rmlFile}")
+
+    if (clear) {
+
+      tconn.begin()
+      val q_drop = QUERY.DROP(context)
+      tconn.prepareUpdate(QueryLanguage.SPARQL, q_drop, baseURI).execute()
+      logger.debug("deleting all triples for context <${context}>")
+      logger.debug(s"SPARQL>\n${q_drop}")
+      tconn.commit()
+
+    }
+
+    {
+      tconn.begin()
+      val q_load = QUERY.LOAD(rdf_dump, context)
+      tconn.prepareUpdate(QueryLanguage.SPARQL, q_load, baseURI).execute()
+      logger.debug(s"loading data into context <${context}> from ${rdf_dump}")
+      logger.debug(s"SPARQL>\n${q_load}")
+      tconn.commit()
+    }
+
+    tconn.close()
+
+    triplestore.shutDown()
+
+  }
+
+  object QUERY {
+
+    def DROP(context: String) = s"""
+      DROP GRAPH <${context}> 
+      ;
+    """.replaceAll("\\s+", " ").trim()
+
+    def LOAD(rdf_dump: String, context: String) = s"""
+      LOAD <${rdf_dump}>
+      INTO GRAPH <${context}>
+      ;
+    """.replaceAll("\\s+", " ").trim()
+
+  }
+
+}
 
