@@ -45,6 +45,7 @@ import java.nio.charset.Charset
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import scala.util.Random
 
 ///**
 // * CHECK:
@@ -114,11 +115,15 @@ object MainOntopSesameWithImpala extends App {
   conn.close()
 
   repo.shutDown()
-  
-  
-  val dump = Files.readAllLines(output_file.toPath()).slice(0, 100).mkString("\n")
+
+  val dump = Files.readAllLines(output_file.toPath())
+    .zipWithIndex.map(_.swap)
+    .map(x => s"${x._1}\t${x._2}")
+    .slice(Random.nextInt(100), Random.nextInt(500)).mkString("\n")
   println("\n\n\n\nRDF DUMP")
   println(dump)
+
+  println("#### RDF mapping - STOP")
 
   System.exit(0)
 
