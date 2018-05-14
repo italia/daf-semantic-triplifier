@@ -4,7 +4,8 @@
 
 # CHECK
 <#DeptTableView> rr:sqlQuery """
- SELECT id, denominazione_it FROM 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni'
+ SELECT id, denominazione_it 
+ FROM 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni'
 """.
 
 <TriplesMap1> a rr:TriplesMapClass;
