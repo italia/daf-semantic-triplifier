@@ -15,10 +15,13 @@ import java.nio.file.OpenOption
 import java.nio.file.StandardOpenOption
 import java.io.FileOutputStream
 import java.util.{ Map => JMap }
+import java.nio.file.attribute.FileAttribute
 
 object DBComuniPOC extends App {
 
-  val db_path = Paths.get("C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db").normalize()
+  val db_path = Paths.get("./db/test_anpr_comuni.db").toAbsolutePath().normalize()
+  if (!db_path.getParent.toFile().exists()) db_path.getParent.toFile().mkdirs()
+
   val jdbc_dsn = s"jdbc:sqlite:${db_path.toString()}"
 
   val jdbc = JDBC(JDBCConfig.DEFAULT.with_dsn(jdbc_dsn))
@@ -44,7 +47,7 @@ object DBComuniPOC extends App {
   jdbc.executeUpdate(query_anpr_stati_esteri_insert)
 
   // TESTING RESULTS............................................................
-  val out_path = Paths.get("target/export/results.csv").normalize()
+  val out_path = Paths.get("target/export/test_anpr_comuni.csv").normalize()
   val out_file = out_path.toFile().getAbsoluteFile
   if (!out_file.getParentFile.exists()) out_file.getParentFile.mkdirs()
   if (out_file.exists) Files.delete(out_path)
@@ -80,7 +83,7 @@ object DBComuniPOC extends App {
   jdbc.stop()
 
   // removes the db
-  // Files.deleteIfExists(db_path)
+  Files.deleteIfExists(db_path)
 
 }
 

@@ -47,6 +47,10 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.util.Random
 
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import java.util.Locale
+
 ///**
 // * CHECK:
 // * Exception in thread "main" java.sql.SQLException: [Simba][ImpalaJDBCDriver](500164) Error initialized or created transport for authentication: null.
@@ -97,8 +101,12 @@ object MainOntopSesameWithImpala extends App {
   repo.initialize();
 
   val conn: RepositoryConnection = repo.getConnection()
+  val vf = conn.getValueFactory
 
   val statements = conn.getStatements(null, null, null, false).asList()
+    .toStream
+    .map(normalize_value)
+
   val output_file = new File("target/EXPORT/testing_rdf.nt").getAbsoluteFile
   if (!output_file.getParentFile.exists()) output_file.getParentFile.mkdirs()
   val fos = new FileOutputStream(output_file)
@@ -117,6 +125,7 @@ object MainOntopSesameWithImpala extends App {
   repo.shutDown()
 
   val dump = Files.readAllLines(output_file.toPath())
+    .toStream
     .zipWithIndex.map(_.swap)
     .map(x => s"${x._1}\t${x._2}")
     .slice(Random.nextInt(100), Random.nextInt(500)).mkString("\n")
@@ -128,6 +137,14 @@ object MainOntopSesameWithImpala extends App {
   System.exit(0)
 
   // ---------------------------------------
+
+  def normalize_value(st: Statement): Statement = {
+    val _value = st.getObject.stringValue()
+    val fixed_value = _value.toLowerCase().split(" ").map(_.capitalize).mkString(" ")
+    val _obj = vf.createLiteral(fixed_value)
+    val fix_st = vf.createStatement(st.getSubject, st.getPredicate, _obj, st.getContext)
+    fix_st
+  }
 
   def createOWLOntology(): OWLOntology = {
     val owlManager = OWLManager.createOWLOntologyManager();
