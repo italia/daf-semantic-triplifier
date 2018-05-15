@@ -45,10 +45,16 @@ object MainTriplification extends App {
 
   val ontop = Ontop
 
-  ontop.triplify_to_file(r2rml_file, dump_file)
+  val ok = ontop.process(r2rml_file)
+  //  { statements =>
+  //    ontop.writeDump(statements, dump_file)
+  //  }
 
-  val dump = ontop.readDump(dump_file)
+  val dump = ontop.previewDump(dump_file)
   println(dump)
+
+  println(".......................")
+  println(ok.mkString("\n"))
 
 }
 
@@ -56,8 +62,30 @@ object Ontop {
 
   val parameters = ConfigFactory.parseString("""
     
+    # impala JDBC config
+    impala_jdbc {
+      host = "slave4.platform.daf.gov.it"
+      port = 21050
+      dsn = "jdbc:impala://"${jdbc.host}":"${jdbc.port}";SSL=1;SSLKeyStore="${jks_file}";SSLKeyStorePwd=Ahdai5th;AuthMech=3;CAIssuedCertNamesMismatch=1"
+      driver = "com.cloudera.impala.jdbc41.Driver"
+      username = "aserafini"
+      password = "openD4ti"
+    }
+    jks_file = "./ssl_impala/master-impala.jks"
+    
+    jdbc {
+      host = "slave4.platform.daf.gov.it"
+      port = 21050
+      dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+      driver = "org.sqlite.JDBC"
+      username = "aserafini"
+      password = "openD4ti"
+    }
+    
     repository.name = "test_anpr_comuni"
     vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
+    
+    baseURI = "test://w3id.org/italia/onto/"
     
   """).resolve()
 
@@ -65,16 +93,16 @@ object Ontop {
 
   // ---- CONFIGS ----------------------------------------------------
 
-  val db_driver = "org.sqlite.JDBC"
-  val db_name = "daf_comuni_test"
+  val db_driver = parameters.getString("jdbc.driver")
   Class.forName(db_driver)
 
-  val dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
-  val usr = "aserafini"
-  val pwd = "openD4ti"
+  val dsn = parameters.getString("jdbc.dsn")
+  val usr = parameters.getString("jdbc.username")
+  val pwd = parameters.getString("jdbc.password")
+  val baseURI = parameters.getString("baseURI")
 
   val dm_boot = new DirectMappingBootstrapper(
-    "test://w3id.org/italia/onto/",
+    baseURI,
     dsn,
     usr, pwd,
     db_driver)
@@ -85,10 +113,11 @@ object Ontop {
 
   // CHECK: save R2RML ?
 
+  // REVIEW: QuestPreferences
   // TODO: automation of re-creation of test db
   val preferences = new QuestPreferences()
   preferences.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL)
-  preferences.setCurrentValueOf(QuestPreferences.DBNAME, db_name)
+  preferences.setCurrentValueOf(QuestPreferences.DBNAME, "db_testing") // HACK
   preferences.setCurrentValueOf(QuestPreferences.JDBC_DRIVER, db_driver)
   preferences.setCurrentValueOf(QuestPreferences.JDBC_URL, dsn)
   preferences.setCurrentValueOf(QuestPreferences.DBUSER, usr)
@@ -99,11 +128,13 @@ object Ontop {
 
   // ---- CONFIGS ----------------------------------------------------
 
-  def writeDump(statements: Seq[Statement], r2rmlFileName: String, dump_file: String) {
-
-  }
-
-  def triplify_to_file(r2rmlFileName: String, dump_file: String) {
+  /**
+   * This method applies the choosen R2RML mapping file, and process the data source,
+   * in order to produce a dump of RDF data.
+   * Using it as a curryied function, is possible to apply different side-effect functions,
+   * designed to save the dump on file, to publish it, and so on
+   */
+  def process[R](r2rmlFileName: String)(implicit dump_action: (Seq[Statement]) => R) = {
 
     val start_time = LocalDateTime.now()
 
@@ -111,7 +142,7 @@ object Ontop {
 
     val r2rmlModel = loadR2RML(r2rmlFile.toString())
 
-    val owlOntology = createOWLOntology() // HACK: start with an empty ontlogy
+    val owlOntology = createOWLOntology() // HACK: start with an empty ontology
 
     val repo = new SesameVirtualRepo(
       parameters.getString("repository.name"),
@@ -122,40 +153,51 @@ object Ontop {
 
     val conn: RepositoryConnection = repo.getConnection()
 
-    val statements: Seq[Statement] = Iterations.asList(conn.getStatements(null, null, null, true))
-      .toStream
-      .distinct
-      .sortWith((st1, st2) => st1.toString().compareTo(st2.toString()) < 0)
+    // handles all the data produced by RDF processor, in some way defined externally
+    val _statements = dump_action {
 
-    val output_file = Paths.get(dump_file).toAbsolutePath().normalize().toFile()
+      Iterations.asList(conn.getStatements(null, null, null, true))
+        .toStream
+        .distinct
+        .sortWith((st1, st2) => st1.toString().compareTo(st2.toString()) < 0)
 
-    if (!output_file.getParentFile.exists()) output_file.getParentFile.mkdirs()
-
-    val format = Rio.getParserFormatForFileName(output_file.getName)
-
-    val fos = new FileOutputStream(output_file)
-
-    // CUSTOM TURTLE WRITER (PRETTY-PRINT)
-    val rdf_writer = new RDF4JPrettyTurtleWriter(fos)
-
-    Rio.write(statements, rdf_writer)
-
-    fos.close()
-
-    val end_time = LocalDateTime.now()
-
-    val processing_time = Duration.create(end_time.getNano - start_time.getNano, TimeUnit.NANOSECONDS).toCoarsest
-
-    logger.info(s"the file ${output_file.getName} was created in ${processing_time}")
+    }
 
     // releasing connection
     conn.close()
 
     if (repo.isInitialized()) repo.shutDown()
 
+    val end_time = LocalDateTime.now()
+    val processing_time = Duration.create(end_time.getNano - start_time.getNano, TimeUnit.NANOSECONDS).toCoarsest
+
+    logger.info(s"RDF data created using ${r2rmlFileName} in ${processing_time}")
+
+    _statements
   }
 
-  def readDump(dumpFileName: String) = {
+  def writeDump(_statements: Seq[Statement], dump_file: String): Seq[Statement] = {
+
+    val output_file = Paths.get(dump_file).toAbsolutePath().normalize().toFile()
+    if (!output_file.getParentFile.exists()) output_file.getParentFile.mkdirs()
+
+    val format = Rio.getParserFormatForFileName(output_file.getName)
+    val fos = new FileOutputStream(output_file)
+
+    // TODO: extends to other formats!
+    // CUSTOM TURTLE WRITER (PRETTY-PRINT)
+    val rdf_writer = new RDF4JPrettyTurtleWriter(fos)
+
+    Rio.write(_statements, rdf_writer)
+
+    fos.close()
+
+    _statements
+  }
+
+  // creates a preview of the RDF dump
+  def previewDump(dumpFileName: String): String = {
+
     Files.readAllLines(Paths.get(dumpFileName))
       .zipWithIndex.map(_.swap)
       .map(x => s"${x._1}\t${x._2}")
@@ -163,11 +205,13 @@ object Ontop {
 
   }
 
+  // creates a new OWLOntology object
   def createOWLOntology(): OWLOntology = {
     val owlManager = OWLManager.createOWLOntologyManager()
     owlManager.createOntology()
   }
 
+  // creates a new OWLOntology object
   def loadOWLOntology(owlFile: String): OWLOntology = {
     val owlManager = OWLManager.createOWLOntologyManager()
     owlManager.loadOntologyFromOntologyDocument(new File(owlFile))
@@ -180,7 +224,9 @@ object Ontop {
     txt
   }
 
-  def loadR2RML(r2rmlFile: String): Model = {
+  def loadR2RML(r2rmlFileName: String): Model = {
+
+    val r2rmlFile = Paths.get(r2rmlFileName).toAbsolutePath().normalize().toFile()
 
     val rdfParser: RDFParser = Rio.createParser(RDFFormat.TURTLE)
     val r2rmlModel: Model = new LinkedHashModel()
@@ -193,15 +239,16 @@ object Ontop {
       .toMap
 
     // inject parameters in mapping file
-    val src = Source.fromFile(new File(r2rmlFile))("UTF-8")
+    val src = Source.fromFile(r2rmlFile)("UTF-8")
     val r2rml_content = injectParameters(src.getLines().mkString("\n"), ps)
     src.close()
 
     val bais = new ByteArrayInputStream(r2rml_content.getBytes)
-    rdfParser.parse(bais, "test://mapping")
+    rdfParser.parse(bais, s"r2rml://mapping/${r2rmlFile.getName}")
     bais.close()
 
     r2rmlModel
+
   }
 
   def loadSPARQL(sparqlFile: String): String = {
