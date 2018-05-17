@@ -21,6 +21,7 @@ class RDF4JPrettyTurtleWriter(fos: OutputStream) extends TurtleWriter(fos) {
   config.set[JBoolean](BasicWriterSettings.XSD_STRING_TO_PLAIN_LITERAL, true)
 
   // TODO: externalize configs for namespaces
+  // TODO: extract namespaces from Seq[Stream]
   this.handleNamespace("skos", "http://www.w3.org/2004/02/skos/core#")
   this.handleNamespace("l0", "https://w3id.org/italia/onto/l0/")
   this.handleNamespace("clvapit", "https://w3id.org/italia/onto/CLV/")

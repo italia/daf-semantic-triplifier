@@ -33,10 +33,13 @@ import info.aduna.iteration.Iterations
 
 object Ontop {
 
+  // TODO: handle multiple mappings in a row (in order to be able to divide them!)
+  
+  // TODO: externalize configs!
   val parameters = ConfigFactory.parseString("""
     
     # impala JDBC config
-    impala{
+    impala {
       jdbc {
         host = "slave4.platform.daf.gov.it"
         port = 21050
@@ -60,9 +63,11 @@ object Ontop {
     jdbc = ${sqlite.jdbc}
     
     repository.name = "test_anpr_comuni"
+    
+    # REVIEW
     vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
     
-    baseURI = "test://w3id.org/italia/onto/"
+    ontologies.base = "https://w3id.org/italia/onto"
     
   """).resolve()
 
@@ -76,10 +81,10 @@ object Ontop {
   val dsn = parameters.getString("jdbc.dsn")
   val usr = parameters.getString("jdbc.username")
   val pwd = parameters.getString("jdbc.password")
-  val baseURI = parameters.getString("baseURI")
+  val base_uri = parameters.getString("ontologies.base")
 
   val dm_boot = new DirectMappingBootstrapper(
-    baseURI,
+    base_uri,
     dsn,
     usr, pwd,
     db_driver)
@@ -133,10 +138,15 @@ object Ontop {
   /**
    * This method applies the choosen R2RML mapping file, and process the data source,
    * in order to produce a dump of RDF data.
+   *
+   * IDEA: In case we need to add extra triples to the dump, we can pass them using extra_statements.
+   *
    * Using it as a curryied function, is possible to apply different side-effect functions,
    * designed to save the dump on file, to publish it, and so on
    */
-  def process[R](r2rmlFileName: String)(implicit dump_action: (Seq[Statement]) => R) = {
+  def processR2RML[R](
+    r2rmlFileName:    String,
+    extra_statements: Seq[Statement] = List())(implicit dump_action: (Seq[Statement]) => R) = {
 
     val start_time = LocalDateTime.now()
 
@@ -151,6 +161,7 @@ object Ontop {
       owlOntology, r2rmlModel,
       preferences)
 
+    // in this case, the repository is created
     if (!repo.isInitialized()) repo.initialize()
 
     val conn: RepositoryConnection = repo.getConnection()
@@ -158,7 +169,7 @@ object Ontop {
     // handles all the data produced by RDF processor, in some way defined externally
     val _statements = dump_action {
 
-      Iterations.asList(conn.getStatements(null, null, null, true))
+      (extra_statements ++ Iterations.asList(conn.getStatements(null, null, null, true)))
         .toStream
         .distinct
         .sortWith((st1, st2) => st1.toString().compareTo(st2.toString()) < 0)
@@ -176,6 +187,7 @@ object Ontop {
     logger.info(s"RDF data created using ${r2rmlFileName} in ${processing_time}")
 
     _statements
+
   }
 
   def writeToOutputStream(_statements: Seq[Statement], out: OutputStream, format: RDFFormat = RDFFormat.NTRIPLES): Seq[Statement] = {
@@ -236,6 +248,9 @@ object Ontop {
     owlManager.loadOntologyFromOntologyDocument(owlFile)
   }
 
+  /*
+   * this methods helps injecting parameters inside a file (typically a mapping file!)
+   */
   def injectParameters(content: String, ps: Map[String, Object]): String = {
     var txt = content
     if (txt.contains("{") && txt.contains("}"))

@@ -1,0 +1,157 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <{ontologies.base}/l0/> .
+@prefix clvapit: <{ontologies.base}/CLV/> .
+
+
+@base  <https://w3id.org/italia/> .
+
+<VIEW_regioni> rr:sqlQuery """
+		
+	SELECT DISTINCT 
+	ISTAT.denominazione_regione AS "__REGION_NAME",
+	LOWER(REPLACE(ISTAT.denominazione_regione, " ", "-")) AS "__REGION_ID",
+	SUBSTR('00'||ISTAT.codice_regione, -2, 2) AS "__REGION_CODE",
+	ISTAT.codice_nuts2_2006 AS "__NUTS_2006_2" ,
+	ISTAT.codice_nuts2_2010 AS "__NUTS_2010_2" ,
+	codice_regione, 
+	denominazione_regione
+	FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+
+		 
+"""
+.
+
+
+<Map_Regione> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_regioni> ;
+	
+	rr:subjectMap [ 
+		rr:template "{vocabularies.base}/territorial-classifications/regions/{'__REGION_CODE'}" ;
+		rr:class skos:Concept, clvapit:Region, clvapit:Feature, clvapit:AddressComponent, clvapit:NamedAddressComponent ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate l0:name ; 
+	  rr:objectMap [ rr:column "__REGION_NAME" ; rr:language "it" ]
+	] ;
+
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:situatedWithin ; 
+	  rr:objectMap [ 
+	  	rr:template "{vocabularies.base}/territorial-classifications/countries/ITA" ;
+	  	rr:termType rr:IRI ;
+	  ] 
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:hasIdentifier ; 
+	  rr:objectMap [
+	  	rr:template "{vocabularies.base}/identifiers/cr-{'__REGION_CODE'}" ;
+	  	rr:termType rr:IRI ;
+	  ] 
+	] ;
+		
+ .
+
+
+# RIVEDERE
+ <Map_CodiceNUTS> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_regioni> ;
+	
+	rr:subjectMap [ 
+		rr:template "http://nuts.geovocab.org/id/{__NUTS_2006_2}" ;
+		rr:class clvapit:Identifier ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate l0:identifier ; 
+	  rr:objectMap [ rr:column "__NUTS_2006_2" ]
+	] ;
+
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:identifierType ; 
+	  rr:objectMap [ rr:constant "Codice NUTS 2" ] 
+	] ;
+	
+ .
+ 
+ <Map_CodiceRegione> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_regioni> ;
+	
+	rr:subjectMap [ 
+		rr:template "{vocabularies.base}/identifiers/cr-{'__REGION_CODE'}" ;
+		rr:class clvapit:Identifier ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate l0:identifier ; 
+	  rr:objectMap [ rr:column "__REGION_CODE" ]
+	] ;
+
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:identifierType ; 
+	  rr:objectMap [ rr:constant "Codice Regione" ] 
+	] ;
+	
+	# CHECK
+	rr:predicateObjectMap [ 
+		rr:predicate owl:sameAs ; 
+		rr:objectMap [ rr:template "http://nuts.geovocab.org/id/{__NUTS_2006_2}" ]; 
+	] ;
+		
+ .
+ 
+ ##############################
+ 
+ 
+ <VIEW_province> rr:sqlQuery """
+		
+	SELECT DISTINCT 
+	codice_provincia, 
+	SUBSTR('000'||ISTAT.codice_provincia, -3, 3) AS "__PROVINCE_CODE",
+	ISTAT.denominazione_provincia AS "__PROVINCE_NAME",
+	codice_nuts3_2006,
+	sigla_automobilistica,
+	SUBSTR('00'||ISTAT.codice_regione, -2, 2) AS "__REGION_CODE" 
+	FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+		 
+"""
+.
+ 
+ 
+<Map_Provincia> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_province> ;
+	
+	rr:subjectMap [ 
+		rr:template "{vocabularies.base}/territorial-classifications/provinces/{'__PROVINCE_CODE'}" ;
+		rr:class skos:Concept, clvapit:Region, clvapit:Feature, clvapit:AddressComponent, clvapit:NamedAddressComponent ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate l0:name ; 
+	  rr:objectMap [ rr:column "__PROVINCE_NAME" ; rr:language "it" ]
+	] ;
+
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:situatedWithin ; 
+	  rr:objectMap [ 
+	  	rr:template "{vocabularies.base}/territorial-classifications/regions/{__REGION_CODE}" ;
+	  	rr:termType rr:IRI ;
+	  ] 
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:hasIdentifier ; 
+	  rr:objectMap [
+	  	rr:template "{vocabularies.base}/identifiers/cp-{'__PROVINCE_CODE'}" ;
+	  	rr:termType rr:IRI ;
+	  ] 
+	] ;
+		
+ .
