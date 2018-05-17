@@ -38,17 +38,23 @@ import it.unibz.inf.ontop.sesame.SesameVirtualRepo
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import java.io.OutputStream
+import java.io.FileInputStream
 
 object MainTriplification extends App {
 
-  val dump_file = "target/EXPORT/test_regioni_v02.ttl"
-  val r2rml_file = "src/test/resources/r2rml/test_regioni_v02.r2rml2.ttl"
+  val dump_file = "target/EXPORT/anpr/regioni_v02.ttl"
+  val r2rml_file = "src/test/resources/r2rml/anpr/regioni_v02.r2rml2.ttl"
+  val meta_file = "src/test/resources/r2rml/anpr/regioni_v02.meta.ttl"
 
   val ontop = Ontop
 
-  val ok = ontop.process(r2rml_file) { statements =>
+  val ok = ontop.processR2RML(r2rml_file) { dump_statements =>
+
     //    ontop.writeToOutputStream(statements, System.out)
-    ontop.writeDump(statements, dump_file)
+
+    //    val all_statemens = (dump_statements ++ Rio.parse(new FileInputStream(meta_file), "", RDFFormat.TURTLE).toStream)
+
+    ontop.writeDump(dump_statements, dump_file)
   }
 
   val dump = ontop.previewDump(dump_file)

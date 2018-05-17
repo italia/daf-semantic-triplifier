@@ -1,0 +1,43 @@
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix adms:     <http://www.w3.org/ns/adms#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcatapit: <http://dati.gov.it/onto/dcatapit#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix xkos:     <http://rdf-vocabulary.ddialliance.org/xkos#> .
+@prefix clvapit:  <https://w3id.org/italia/onto/CLV/> .
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions>
+	a skos:ConceptScheme, adms:Asset, dcatapit:Dataset ;
+	dct:title "Controlled Vocabulary for Italian Regions"@en , "Vocabolario Controllato delle Regioni d'Italia"@it ;
+	dct:description "Vocabolario controllato delle regioni d'Italia e relativo codice regione"@it , "Controlled Vocabulary for describing Italy as country"@en  ;
+	xkos:numberOfLevels "1" ;
+	dct:type <http://purl.org/adms/assettype/CodeList> ;
+	adms:representationTechnique <http://purl.org/adms/representationtechnique/SKOS> ;
+	dct:identifier "agid:D.14";
+	dct:rightsHolder <http://spcdata.digitpa.gov.it/browse/page/Amministrazione/agid> ;
+	dct:creator <http://spcdata.digitpa.gov.it/browse/page/Amministrazione/agid> , <http://dati.gov.it/data/resource/Amministrazione/td_PCM> ;
+	dct:publisher <http://spcdata.digitpa.gov.it/browse/page/Amministrazione/agid>  ;
+	dcat:theme <http://publications.europa.eu/resource/authority/data-theme/REGI> ;
+	dct:conformsTo  <http://dati.gov.it/data/resource/Standard/SKOS> ;
+	dct:language <http://publications.europa.eu/resource/authority/language/ITA> ;
+	dct:accrualPeriodicity <http://publications.europa.eu/resource/authority/frequency/IRREG> ;
+	rdfs:isDefinedBy <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/italy> ;
+	dcat:keyword "Regione"@it, "Regioni"@it , "Region"@en, "Regions"@en ;
+	dcat:distribution <http://dati.gov.it/data/resource/Distribution/regions_RDF_Turtle> , <http://dati.gov.it/data/resource/Distribution/regions_RDF_XML> , <http://dati.gov.it/data/resource/Distribution/regions_JSON_LD>  ;
+	dcat:contactPoint <http://dati.gov.it/data/resource/ContactPoint/voc_AgID> ;
+	skos:hasTopConcept <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/01> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/02> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/03> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/04> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/05> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/06> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/07> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/08> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/09> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/10> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/11> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/12> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/13> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/14> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/15> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/16> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/17> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/18> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/19> , <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/20> ;
+	dct:issued "2018-04-12"^^xsd:date ;
+	dct:modified "2018-04-12"^^xsd:date ;
+	owl:versionInfo "1.0" ;
+
+	.
