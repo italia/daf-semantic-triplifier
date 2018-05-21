@@ -1,4 +1,4 @@
-package experiments
+package wip
 
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -46,15 +46,14 @@ object MainTriplification extends App {
   val r2rml_file = "src/test/resources/r2rml/anpr/regioni_v02.r2rml2.ttl"
   val meta_file = "src/test/resources/r2rml/anpr/regioni_v02.meta.ttl"
 
+  // TODO: capire rallentamenti / problemi di connettività con Impala di DAF!!!
+
   val ontop = Ontop
 
   val ok = ontop.processR2RML(r2rml_file) { dump_statements =>
 
-    //    ontop.writeToOutputStream(statements, System.out)
+    ontop.writeToOutputStream(dump_statements, System.out)
 
-    //    val all_statemens = (dump_statements ++ Rio.parse(new FileInputStream(meta_file), "", RDFFormat.TURTLE).toStream)
-
-    ontop.writeDump(dump_statements, dump_file)
   }
 
   val dump = ontop.previewDump(dump_file)
@@ -65,6 +64,7 @@ object MainTriplification extends App {
 
 }
 
-
-
-
+/*
+//    val all_statemens = (dump_statements ++ Rio.parse(new FileInputStream(meta_file), "", RDFFormat.TURTLE).toStream)
+//    ontop.writeDump(dump_statements, dump_file)
+ */

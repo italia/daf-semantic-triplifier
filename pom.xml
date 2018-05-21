@@ -143,6 +143,20 @@
 			<version>1.3.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>impala</groupId>
+			<artifactId>impala-jdbc</artifactId>
+			<version>41</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/ImpalaJDBC41.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>impala</groupId>
+			<artifactId>TCLIServiceClient</artifactId>
+			<version>41</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/TCLIServiceClient.jar</systemPath>
+		</dependency>
 
 		<!-- impala JDBC dependencies -->
 		<dependency>

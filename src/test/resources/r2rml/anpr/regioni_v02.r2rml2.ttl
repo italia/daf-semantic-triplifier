@@ -17,9 +17,9 @@
 	ISTAT.codice_nuts2_2010 AS "__NUTS_2010_2" ,
 	codice_regione, 
 	denominazione_regione
-	FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+	-- FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+	FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani AS ISTAT
 
-		 
 """
 .
 
