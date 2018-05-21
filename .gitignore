@@ -6,6 +6,8 @@
 .cache-tests
 .settings/
 
+.ssl_impala/
+
 bin/
 target/
 

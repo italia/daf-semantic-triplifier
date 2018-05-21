@@ -1,0 +1,31 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+
+
+@base  <https://w3id.org/italia/> .
+
+
+<VIEW_regioni> rr:sqlQuery """
+		
+	SELECT codice_regione FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' 
+		 
+"""
+.
+
+<TriplesMap_Region> a rr:TriplesMapClass ;
+
+	rr:logicalTable <VIEW_regioni> ;
+	
+	# rr:logicalTable [ rr:tableName "default_org_o_istat_elenco_comuni_italiani" ];
+	
+	rr:subjectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'codice_regione'}" ;
+		rr:class skos:Concept, clvapit:Region ;
+	] ;
+	
+ .
+
+ 

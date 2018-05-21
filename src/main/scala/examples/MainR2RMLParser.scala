@@ -25,6 +25,9 @@ object MainR2RMLParser extends App {
   val templs = factory.createTemplate("http://example/{id}")
   val sm = factory.createSubjectMap(templs)
 
+  // IDEA: check tramite JDBC dei nomi di colonna per creazione predicate map
+  //  factory.createPredicateMap(columnName)
+
   println(sm)
 
   //  factory.createPredicateObjectMap(arg0, arg1, arg2)

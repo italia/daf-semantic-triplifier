@@ -1,4 +1,4 @@
-package experiments
+package wip
 
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -34,7 +34,7 @@ import info.aduna.iteration.Iterations
 object Ontop {
 
   // TODO: handle multiple mappings in a row (in order to be able to divide them!)
-  
+
   // TODO: externalize configs!
   val parameters = ConfigFactory.parseString("""
     
@@ -60,9 +60,10 @@ object Ontop {
       password = "openD4ti"
     }
     
-    jdbc = ${sqlite.jdbc}
+    jdbc = ${impala.jdbc}
     
     repository.name = "test_anpr_comuni"
+    db.name = "opendata"
     
     # REVIEW
     vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
@@ -93,13 +94,15 @@ object Ontop {
 
   // CHECK  dm_onto.saveOntology(new TurtleDocumentFormat, System.err)
 
+  // CHECK: st.executeUpdate("""USE opendata""")
+
   // CHECK: save R2RML ?
 
   // REVIEW: QuestPreferences
   // TODO: automation of re-creation of test db
   val preferences = new QuestPreferences()
   preferences.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL)
-  preferences.setCurrentValueOf(QuestPreferences.DBNAME, "db_testing") // REVIEW: maybe this should be used in process()
+  preferences.setCurrentValueOf(QuestPreferences.DBNAME, "PROVA") //parameters.getString("db.name")) // REVIEW: maybe this should be used in process()
   preferences.setCurrentValueOf(QuestPreferences.JDBC_DRIVER, db_driver)
   preferences.setCurrentValueOf(QuestPreferences.JDBC_URL, dsn)
   preferences.setCurrentValueOf(QuestPreferences.DBUSER, usr)
@@ -170,9 +173,9 @@ object Ontop {
     val _statements = dump_action {
 
       (extra_statements ++ Iterations.asList(conn.getStatements(null, null, null, true)))
-        .toStream
+        .toList // REVIEW: Stream
         .distinct
-        .sortWith((st1, st2) => st1.toString().compareTo(st2.toString()) < 0)
+      //   REVIEW     .sortWith((st1, st2) => st1.toString().compareTo(st2.toString()) < 0)
 
     }
 
