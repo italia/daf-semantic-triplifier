@@ -17,9 +17,9 @@ object MainOntopSQLite extends App {
   val ontop = new OntopProcessor
 
   val mappings = List(
-    R2RMLQueries.istat_comuni_00,
-    R2RMLQueries.istat_comuni_01,
-    R2RMLQueries.istat_comuni_02)
+    R2RMLQueries.comuni_comuni,
+    R2RMLQueries.comuni_province,
+    R2RMLQueries.comuni_regioni)
 
   val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
 
@@ -28,7 +28,7 @@ object MainOntopSQLite extends App {
   println("namespaces\n\t" + namespaces.mkString("\n\t"))
 
   val fos = new FileOutputStream(new File(dump_file))
-  ontop.dump(mappings, fos, RDFFormat.NTRIPLES)
+  ontop.dump(mappings, fos, RDFFormat.TURTLE)
   fos.flush()
   fos.close()
 
@@ -41,7 +41,7 @@ object MainOntopSQLite extends App {
 
 object R2RMLQueries {
 
-  def istat_comuni_01 = """
+  def comuni_regioni = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -80,7 +80,7 @@ object R2RMLQueries {
      
   """
 
-  def istat_comuni_02 = """
+  def comuni_province = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -122,24 +122,24 @@ object R2RMLQueries {
      
   """
 
-  def istat_comuni_00 = """
+  def comuni_comuni = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
     @prefix l0: <https://w3id.org/italia/onto/l0/> .
     @prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+    @prefix tiapit: <https://w3id.org/italia/onto/TI/> .
     
     @base  <https://w3id.org/italia/> .
-    
     
     <VIEW_comuni> rr:sqlQuery "
       
       SELECT DISTINCT
-      ISTAT.denominazione_corrente AS _NOME
+      ISTAT.denominazione_corrente AS _NOME   
       ,ANPR.stato AS _STATO 
       ,ANPR.codcatastale AS _CODICE_CATASTALE 
       ,ISTAT.codice_provincia AS _CODICE_PROVINCIA 
-      ,ISTAT.codice_comune_formato_numerico AS _CODICE_ISTAT   
+      ,ISTAT.codice_comune_formato_numerico AS _CODICE_ISTAT
       ,dataistituzione AS _DATA_ISTITUZIONE
       ,datacessazione AS _DATA_CESSAZIONE
       ,dataultimoagg AS _DATA_AGGIORNAMENTO 
@@ -151,12 +151,77 @@ object R2RMLQueries {
     "
     .
     
+    # TODO: add UDF for time / date
+    
+    <TriplesMap_TimeInterval> a rr:TriplesMapClass ;
+    
+      rr:logicalTable <VIEW_comuni> ;
+      
+      rr:subjectMap [ 
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'}-{'_DATA_CESSAZIONE'})" ;
+    		rr:class tiapit:TimeInterval ;
+    	] ;
+    	rr:predicateObjectMap [ 
+        rr:predicate clvapit:start_date ; 
+        rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; ]
+      ] ;
+      rr:predicateObjectMap [ 
+        rr:predicate clvapit:end_date ; 
+        rr:objectMap [ rr:column "_DATA_CESSAZIONE" ; ]
+      ] ;
+      rr:predicateObjectMap [ 
+        rr:predicate clvapit:date ; 
+        rr:objectMap [ rr:column "_DATA_AGGIORNAMENTO" ; ]
+      ] ;
+      
+    .
+    
+    <TriplesMap_CodiceISTAT> a rr:TriplesMapClass ;
+    
+      rr:logicalTable <VIEW_comuni> ;
+      
+      rr:subjectMap [ 
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-istat-{'_CODICE_ISTAT'}" ;
+    		rr:class clvapit:Identifier ;
+    	] ;
+    	rr:predicateObjectMap [ 
+        rr:predicate l0:identifier ; 
+        rr:objectMap [ rr:column "_CODICE_ISTAT" ; ]
+      ] ;
+      rr:predicateObjectMap [ 
+        rr:predicate clvapit:identifierType ; 
+        rr:objectMap [ rr:constant "Codice ISTAT" ; ]
+      ] ;
+      
+    .
+    
+    <TriplesMap_CodiceCatastale> a rr:TriplesMapClass ;
+    
+      rr:logicalTable <VIEW_comuni> ;
+      
+      rr:subjectMap [ 
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-catastale-{'_CODICE_CATASTALE'}" ;
+    		rr:class clvapit:Identifier ;
+    	] ;
+    	rr:predicateObjectMap [ 
+        rr:predicate l0:identifier ; 
+        rr:objectMap [ rr:column "_CODICE_CATASTALE" ; ]
+      ] ;
+      rr:predicateObjectMap [ 
+        rr:predicate clvapit:identifierType ; 
+        rr:objectMap [ rr:constant "Codice Catastale" ; ]
+      ] ;
+      
+    .
+    
     <TriplesMap_Comuni> a rr:TriplesMapClass ;
     
     	rr:logicalTable <VIEW_comuni> ;
+    	
+    	# rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; // HACK locale per le date
     	    	
     	rr:subjectMap [ 
-    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_DATA_ISTITUZIONE'}/{'_CODICE_ISTAT'}" ;
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_CODICE_ISTAT'}@{'_DATA_ISTITUZIONE'}" ;
     		rr:class skos:Concept, clvapit:City ;
     	] ;
     	
@@ -169,35 +234,48 @@ object R2RMLQueries {
     	] ;
     	
     	rr:predicateObjectMap [ 
+    	  rr:predicate clvapit:hasIdentifier ; 
+    	  rr:objectMap [ 
+    	  	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-istat-{'_CODICE_ISTAT'}" ;
+    	  	rr:termType rr:IRI ;
+    	  ] 
+    	] ;
+    	rr:predicateObjectMap [ 
+    	  rr:predicate clvapit:hasIdentifier ; 
+    	  rr:objectMap [ 
+    	  	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-catastale-{'_CODICE_CATASTALE'}" ;
+    	  	rr:termType rr:IRI ;
+    	  ] 
+    	] ;
+    	
+    	rr:predicateObjectMap [ 
         rr:predicate l0:name ; 
         rr:objectMap [ rr:column "_NOME" ; rr:language "it" ]
       ] ;
       
       rr:predicateObjectMap [ 
         rr:predicate l0:_STATO ; 
-        rr:objectMap [ rr:column "_STATO" ; ]
+        rr:objectMap [ rr:column "_STATO" ; ] # CHECK: da capire dove mappare questa informazione!
       ] ;
     	
     	rr:predicateObjectMap [ 
-        rr:predicate l0:_CODICE_CATASTALE ; 
-        rr:objectMap [ rr:column "_CODICE_CATASTALE" ; ]
-      ] ;
-      
+    	  rr:predicate clvapit:has_validity ; 
+    	  rr:objectMap [ 
+    		  rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'}-{'_DATA_CESSAZIONE'})" ;
+    	  	rr:termType rr:IRI ;
+    	  ] 
+    	] ;
+    	
       rr:predicateObjectMap [ 
-        rr:predicate l0:_CODICE_ISTAT ; 
-        rr:objectMap [ rr:column "_CODICE_ISTAT" ; ]
-      ] ;
-      
-      rr:predicateObjectMap [ 
-        rr:predicate l0:_DATA_ISTITUZIONE ; 
-        rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; ]
+        rr:predicate clvapit:time_of_issuance ; 
+        rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; ] # HACK: va aggiunto rr:datatype xsd:date (valutare UDF su sqlite)
       ] ;
       rr:predicateObjectMap [ 
-        rr:predicate l0:_DATA_CESSAZIONE ; 
-        rr:objectMap [ rr:column "_DATA_CESSAZIONE" ; ]
+        rr:predicate clvapit:date ; # DATA di AGGIORNAMENTO? 
+        rr:objectMap [ rr:column "_DATA_CESSAZIONE" ;  ]
       ] ;
       rr:predicateObjectMap [ 
-        rr:predicate l0:_DATA_AGGIORNAMENTO ; 
+        rr:predicate clvapit:update_time ; 
         rr:objectMap [ rr:column "_DATA_AGGIORNAMENTO" ; ]
       ] ;
       
