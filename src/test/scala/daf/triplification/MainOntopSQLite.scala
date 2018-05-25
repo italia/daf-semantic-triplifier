@@ -53,7 +53,10 @@ object R2RMLQueries {
     
     <VIEW_regioni> rr:sqlQuery "
       
-      SELECT codice_regione, *  
+      SELECT 
+        codice_regione AS _CODICE_REGIONE 
+        ,denominazione_regione AS _NOME_REGIONE 
+        ,codice_nuts2_2006 AS _NUTS2  
       FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' 
     
     "
@@ -64,14 +67,27 @@ object R2RMLQueries {
     	rr:logicalTable <VIEW_regioni> ;
     	    	
     	rr:subjectMap [ 
-    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'codice_regione'}" ;
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
     		rr:class skos:Concept, clvapit:Region ;
     	] ;
+    	
+    	rr:predicateObjectMap [ 
+        rr:predicate l0:name ; 
+        rr:objectMap [ rr:column "_NOME_REGIONE" ; rr:language "it" ]
+      ] ;
     	
     	rr:predicateObjectMap [ 
     	  rr:predicate clvapit:situatedWithin ; 
     	  rr:objectMap [ 
     	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA" ;
+    	  	rr:termType rr:IRI ;
+    	  ] 
+    	] ;
+    	
+    	rr:predicateObjectMap [ 
+    	  rr:predicate owl:sameAs ; 
+    	  rr:objectMap [ 
+    	  	rr:template "http://nuts.geovocab.org/id/{'_NUTS2'}" ;
     	  	rr:termType rr:IRI ;
     	  ] 
     	] ;
@@ -86,6 +102,7 @@ object R2RMLQueries {
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
     @prefix l0: <https://w3id.org/italia/onto/l0/> .
     @prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+    @prefix nuts: <http://nuts.geovocab.org/id/> .
     
     @base  <https://w3id.org/italia/> .
     
@@ -93,12 +110,35 @@ object R2RMLQueries {
     <VIEW_province> rr:sqlQuery "
       
       SELECT 
-        codice_provincia, 
-        codice_regione, 
-        *  
-      FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' 
+        codice_provincia AS _CODICE_PROVINCIA   
+        ,codice_regione AS _CODICE_REGIONE 
+        ,denominazione_regione AS _NOME_REGIONE 
+        ,denominazione_provincia AS _NOME_PROVINCIA 
+        ,sigla_automobilistica AS _SIGLA_AUTOMOBILISTICA
+        ,codice_nuts2_2006 AS _NUTS2
+        ,codice_nuts3_2006 AS _NUTS3  
+      FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani'  
     
     "
+    .
+    
+    <TriplesMap_SiglaAutomobilistica> a rr:TriplesMapClass ;
+    
+      rr:logicalTable <VIEW_province> ;
+      
+      rr:subjectMap [ 
+    	  rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/sigla-automobilistica-{'_SIGLA_AUTOMOBILISTICA'}" ;
+    		rr:class clvapit:Identifier ;
+    	] ;
+    	rr:predicateObjectMap [ 
+        rr:predicate l0:identifier ; 
+        rr:objectMap [ rr:column "_SIGLA_AUTOMOBILISTICA" ; ]
+      ] ;
+      rr:predicateObjectMap [ 
+        rr:predicate clvapit:identifierType ; 
+        rr:objectMap [ rr:constant "Sigla Automobilistica" ; ]
+      ] ;
+      
     .
     
     <TriplesMap_Province> a rr:TriplesMapClass ;
@@ -106,14 +146,35 @@ object R2RMLQueries {
     	rr:logicalTable <VIEW_province> ;
     	    	
     	rr:subjectMap [ 
-    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'codice_provincia'}" ;
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_CODICE_PROVINCIA'}" ;
     		rr:class skos:Concept, clvapit:Province ;
     	] ;
+    	
+    	rr:predicateObjectMap [ 
+        rr:predicate l0:name ; 
+        rr:objectMap [ rr:column "_NOME_PROVINCIA" ; rr:language "it" ]
+      ] ;
     	
       rr:predicateObjectMap [ 
     	  rr:predicate clvapit:situatedWithin ; 
     	  rr:objectMap [ 
-    	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'codice_regione'}" ;
+    	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
+    	  	rr:termType rr:IRI ;
+    	  ] 
+    	] ;
+    	
+    	rr:predicateObjectMap [ 
+    	  rr:predicate clvapit:hasIdentifier ; 
+    	  rr:objectMap [ 
+    	  	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/sigla-automobilistica-{'_SIGLA_AUTOMOBILISTICA'}" ;
+    	  	rr:termType rr:IRI ;
+    	  ] 
+    	] ;
+    	
+    	rr:predicateObjectMap [ 
+    	  rr:predicate owl:sameAs ; 
+    	  rr:objectMap [ 
+    	  	rr:template "http://nuts.geovocab.org/id/{'_NUTS3'}" ;
     	  	rr:termType rr:IRI ;
     	  ] 
     	] ;
