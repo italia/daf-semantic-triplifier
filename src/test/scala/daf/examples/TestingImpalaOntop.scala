@@ -1,74 +1,46 @@
-package daf.testing.impala
-
-import it.unibz.inf.ontop.sesame.SesameVirtualRepo
-import org.slf4j.LoggerFactory
-import java.sql.DriverManager
-import java.io.File
-import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences
-import java.time.LocalDateTime
-import org.openrdf.repository.RepositoryConnection
-
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
+package daf.examples
 import it.unibz.inf.ontop.owlrefplatform.core.QuestConstants
-import java.io.FileOutputStream
-import org.openrdf.rio.RDFFormat
-import org.openrdf.rio.Rio
-import scala.concurrent.duration.Duration
-import java.util.concurrent.TimeUnit
-import java.nio.file.Files
-import scala.util.Random
-import org.openrdf.model.Statement
-import org.semanticweb.owlapi.model.OWLOntology
-import org.semanticweb.owlapi.apibinding.OWLManager
-import org.openrdf.model.impl.LinkedHashModel
+import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences
+import it.unibz.inf.ontop.sesame.RepositoryConnection
+import it.unibz.inf.ontop.sesame.SesameVirtualRepo
 import org.openrdf.model.Model
+import org.openrdf.model.impl.LinkedHashModel
+import org.openrdf.rio.RDFFormat
 import org.openrdf.rio.RDFParser
 import org.openrdf.rio.helpers.StatementCollector
+import org.semanticweb.owlapi.apibinding.OWLManager
+import org.semanticweb.owlapi.model.OWLOntology
+import java.io.File
 import java.io.FileInputStream
 import scala.io.Source
-import java.io.ByteArrayInputStream
+import java.sql.DriverManager
+import org.openrdf.model.Statement
+import org.openrdf.rio.Rio
+import java.io.FileOutputStream
+import scala.concurrent.duration.Duration
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
+import org.slf4j.LoggerFactory
+import java.nio.file.Files
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import scala.util.Random
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
-// THIS IS A WORKING EXAMPLE, for DAF-IMPALA + ONTOP
-object ExampleImpalaANPRComuni extends App {
-
-  object R2RMLExamples {
-
-    def anpr_comuni = """
-    
-    @prefix rr: <http://www.w3.org/ns/r2rml#>.
-    @prefix ex: <http://example.com/ns#>.
-    
-    <TriplesMap1> a rr:TriplesMapClass;
-
-    rr:logicalTable [ rr:tableName "gove__amministrazione.default_org_o_anpr_archivio_storico_comuni" ];
-    
-    rr:subjectMap [
-    	rr:template "http://w3id.org/italia/resources/comuni/{id}" ;
-    	rr:class ex:City ;
-    ] ;
-    
-    rr:predicateObjectMap [ 
-      rr:predicate ex:name; 
-      rr:objectMap [
-      	rr:column "denominazione_it" ;
-      ]
-    ] ;
-
-    .
-
-  """
-
-  }
+///**
+// * CHECK:
+// * Exception in thread "main" java.sql.SQLException: [Simba][ImpalaJDBCDriver](500164) Error initialized or created transport for authentication: null.
+// */
+object MainOntopSesameWithImpala extends App {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
   val db_driver = "com.cloudera.impala.jdbc41.Driver"
-  val db_name = "gove__amministrazione"
-
+  val db_name = "opendata.roma_o_incidenti_d_stradali"
   Class.forName(db_driver)
 
-  val dsn = "jdbc:impala://slave4.platform.daf.gov.it:21050;SSL=1;SSLKeyStore=./ssl_impala/master-impala.jks;SSLKeyStorePwd=Ahdai5th;AuthMech=3;CAIssuedCertNamesMismatch=1"
+  val dsn = "jdbc:impala://slave4.platform.daf.gov.it:21050;SSL=1;SSLKeyStore=C:/Users/Al.Serafini/awavedev/progetti/DAF/ssl_impala/master-impala.jks;SSLKeyStorePwd=Ahdai5th;AuthMech=3;CAIssuedCertNamesMismatch=1"
   val usr = "aserafini"
   val pwd = "openD4ti"
 
@@ -79,9 +51,9 @@ object ExampleImpalaANPRComuni extends App {
 
   val r2rmlFile = new File("src/test/resources/r2rml/poc_anpr_comuni.r2rml.ttl").getAbsoluteFile;
 
-  val r2rmlModel = loadR2RMLString(R2RMLExamples.anpr_comuni)
+  val r2rmlModel = loadR2RML(r2rmlFile.toString());
 
-  val owlOntology = createOWLOntology()
+  val owlOntology = createOWLOntology() //loadOWLOntology(owlFile);
 
   // TODO: automation of re-creation of test db
   val preferences = new QuestPreferences();
@@ -161,19 +133,7 @@ object ExampleImpalaANPRComuni extends App {
     owlManager.loadOntologyFromOntologyDocument(new File(owlFile));
   }
 
-  def loadR2RMLString(r2rml: String): Model = {
-
-    val rdfParser: RDFParser = Rio.createParser(RDFFormat.TURTLE);
-    val r2rmlModel: Model = new LinkedHashModel();
-    val collector = new StatementCollector(r2rmlModel);
-    rdfParser.setRDFHandler(collector);
-    val bais = new ByteArrayInputStream(r2rml.getBytes)
-    rdfParser.parse(bais, "http://example.org");
-    bais.close()
-    r2rmlModel
-  }
-
-  def loadR2RMLFile(r2rmlFile: String): Model = {
+  def loadR2RML(r2rmlFile: String): Model = {
     val rdfParser: RDFParser = Rio.createParser(RDFFormat.TURTLE);
     val r2rmlModel: Model = new LinkedHashModel();
     val collector = new StatementCollector(r2rmlModel);
@@ -189,5 +149,4 @@ object ExampleImpalaANPRComuni extends App {
     src.close()
     txt
   }
-
 }

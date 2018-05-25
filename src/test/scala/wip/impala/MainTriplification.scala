@@ -1,4 +1,4 @@
-package wip
+package wip.impala
 
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -40,6 +40,7 @@ import scala.collection.JavaConverters._
 import java.io.OutputStream
 import java.io.FileInputStream
 
+// REVIEW
 object MainTriplification extends App {
 
   val dump_file = "target/EXPORT/anpr/regioni_v02.ttl"
@@ -59,12 +60,4 @@ object MainTriplification extends App {
   val dump = ontop.previewDump(dump_file)
   println(dump)
 
-  //  println(".......................")
-  //  println(ok.mkString("\n"))
-
 }
-
-/*
-//    val all_statemens = (dump_statements ++ Rio.parse(new FileInputStream(meta_file), "", RDFFormat.TURTLE).toStream)
-//    ontop.writeDump(dump_statements, dump_file)
- */

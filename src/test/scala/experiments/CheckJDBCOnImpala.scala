@@ -1,4 +1,4 @@
-package examples
+package experiments
 
 import java.sql.DriverManager
 
