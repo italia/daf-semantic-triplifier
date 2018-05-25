@@ -37,6 +37,7 @@ import com.typesafe.config.ConfigFactory
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.openrdf.rio.WriterConfig
+import org.openrdf.rio.RioSetting
 
 /**
  *
@@ -99,7 +100,7 @@ class OntopProcessor() {
     val r2rmlModel = loadR2RMLString(r2rml) // TODO: manage baseURI by configuration!
 
     val triplesMaps = this.triplesMaps(r2rmlModel)
-    
+
     logger.info("\nRDF mapping, using TripleMap definitions:")
     logger.info(triplesMaps.mkString("\n"))
 
@@ -110,7 +111,7 @@ class OntopProcessor() {
     val conn: RepositoryConnection = repo.getConnection()
     vf = conn.getValueFactory
 
-    val statements = Iterations.asList(conn.getStatements(null, null, null, true))
+    val statements = Iterations.asList(conn.getStatements(null, null, null, true)).toStream
 
     val size = statements.size
 
@@ -146,10 +147,11 @@ class OntopProcessor() {
           val test1 = s"${st1.getContext}${st1.getSubject}${st1.getPredicate}"
           val test2 = s"${st2.getContext}${st2.getSubject}${st2.getPredicate}"
           test1.compareTo(test2) < 0
-      }
+      }.distinct
 
     // CHECK
     val settings = new WriterConfig
+
     // TODO: pretty print
     Rio.write(statements, out, rdf_format)
 
