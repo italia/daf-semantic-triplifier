@@ -1,5 +1,5 @@
-package testing.daf;
-//package examples
+package daf.review;
+//package other
 //
 //import it.unibz.inf.ontop.rdf4j.repository.OntopRepository;
 //import org.eclipse.rdf4j.model.Statement;
@@ -17,26 +17,31 @@ package testing.daf;
 //import it.unibz.inf.ontop.injection.OntopSQLOWLAPIConfiguration
 //import java.io.File
 //
-//object MainOntopRDF4JExample extends App {
+//object MainOntopRDF4JExampleImpalaDAF extends App {
 //
-//  val db_path = Paths.get("C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db").normalize()
-//
-//  val jdbc_driver = "org.sqlite.JDBC"
-//  val jdbc_dsn = s"jdbc:sqlite:${db_path}"
-//  val jdbc_name = "daf.sqlite"
+//  val jdbc_driver = "com.cloudera.impala.jdbc41.Driver"
+//  val jdbc_dsn = "jdbc:impala://slave4.platform.daf.gov.it:21050;SSL=1;SSLKeyStore=C:/Users/Al.Serafini/awavedev/progetti/DAF/ssl_impala/master-impala.jks;SSLKeyStorePwd=Ahdai5th;AuthMech=3;CAIssuedCertNamesMismatch=1"
+//  val jdbc_name = "daf.impala"
 //  val jdbc_user = "aserafini"
 //  val jdbc_password = "openD4ti"
 //
 //  val r2rmlFile = Paths.get("src/test/resources/r2rml/poc_anpr_comuni.r2rml.ttl").toUri().toString()
 //
 //  val configuration: OntopSQLOWLAPIConfiguration = OntopSQLOWLAPIConfiguration.defaultBuilder()
+//    // .ontologyFile(owlFile)
 //    .r2rmlMappingFile(r2rmlFile)
+//    // .propertyFile(propertyFile)
 //    .jdbcDriver(jdbc_driver)
 //    .jdbcUrl(jdbc_dsn)
-////    .jdbcName(jdbc_name)
+//    .jdbcName(jdbc_name)
 //    .jdbcUser(jdbc_user)
 //    .jdbcPassword(jdbc_password)
-//    .enableTestMode()
+////    .enableTestMode()
+////    .enableProvidedDBMetadataCompletion(true)
+////    .enableExistentialReasoning(true)
+////    .enableDefaultDatatypeInference(true)
+////    .enableFullMetadataExtraction(true)
+////    .enableOntologyAnnotationQuerying(true)
 //    .build()
 //
 //  println("#### START")

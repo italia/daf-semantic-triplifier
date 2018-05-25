@@ -1,81 +1,37 @@
-package testing.daf
-import it.unibz.inf.ontop.owlrefplatform.core.QuestConstants;
-
-import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences;
-import it.unibz.inf.ontop.sesame.RepositoryConnection;
-import it.unibz.inf.ontop.sesame.SesameVirtualRepo;
-import org.openrdf.model.Model;
-import org.openrdf.model.impl.LinkedHashModel;
-import org.openrdf.query.Binding;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.helpers.StatementCollector;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+package daf.examples
+import it.unibz.inf.ontop.owlrefplatform.core.QuestConstants
+import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences
+import it.unibz.inf.ontop.sesame.RepositoryConnection
+import it.unibz.inf.ontop.sesame.SesameVirtualRepo
+import org.openrdf.model.Model
+import org.openrdf.model.impl.LinkedHashModel
+import org.openrdf.rio.RDFFormat
+import org.openrdf.rio.RDFParser
+import org.openrdf.rio.helpers.StatementCollector
+import org.semanticweb.owlapi.apibinding.OWLManager
+import org.semanticweb.owlapi.model.OWLOntology
+import java.io.File
+import java.io.FileInputStream
 import scala.io.Source
-import java.sql.DriverManager
-import scala.collection.mutable.ListBuffer
-import org.openrdf.model.Statement
 import org.openrdf.rio.Rio
-
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
 import scala.concurrent.duration.Duration
-import java.util.Date
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
-import it.unibz.inf.ontop.sql.ImplicitDBConstraintsReader
 import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.charset.Charset
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.util.Random
-import org.sqlite.Function
-import it.unibz.inf.ontop.r2rml.R2RMLManager
-import org.semanticweb.owlapi.model.OWLDocumentFormat
-import org.semanticweb.owlapi.formats.TurtleDocumentFormat
-import it.unibz.inf.ontop.model.OBDAModel
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import it.unibz.inf.ontop.r2rml.R2RMLParser
-import it.unibz.inf.ontop.r2rml.R2RMLReader
-import it.unibz.inf.ontop.r2rml.OBDAMappingTransformer
-import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl
-import org.openrdf.model.impl.TreeModel
 import it.unibz.inf.ontop.owlapi.bootstrapping.DirectMappingBootstrapper
-import it.unibz.inf.ontop.r2rml.R2RMLWriter
-import eu.optique.api.mapping.impl.R2RMLUtil
 import org.openrdf.rio.turtle.TurtleWriter
-import org.eclipse.rdf4j.query.resultio.QueryResultIO
-import org.openrdf.rio.RioSetting
 import org.openrdf.rio.WriterConfig
 import org.openrdf.rio.helpers.BasicWriterSettings
-
 import java.lang.{ Boolean => JBoolean }
 import org.openrdf.query.resultio.BasicQueryWriterSettings
 import org.openrdf.rio.helpers.XMLWriterSettings
-import org.openrdf.model.Resource
-import org.openrdf.model.impl.ValueFactoryBase
-import org.openrdf.model.impl.ValueFactoryImpl
-import info.aduna.iteration.Iteration
 import info.aduna.iteration.Iterations
 
 object TestingSQLiteOntop extends App {

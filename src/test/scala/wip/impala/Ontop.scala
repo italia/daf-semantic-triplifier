@@ -1,4 +1,4 @@
-package wip
+package wip.impala
 
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -30,6 +30,7 @@ import scala.util.Random
 import java.nio.file.Files
 import java.io.FileOutputStream
 import info.aduna.iteration.Iterations
+import daf.triplification.RDF4JPrettyTurtleWriter
 
 object Ontop {
 

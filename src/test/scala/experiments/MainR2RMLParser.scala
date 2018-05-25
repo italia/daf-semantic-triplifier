@@ -1,12 +1,6 @@
-package examples
+package experiments
 
-import it.unibz.inf.ontop.r2rml.R2RMLParser
-import eu.optique.api.mapping.R2RMLMappingManager
-//import eu.optique.api.mapping.MappingFactory
-import eu.optique.r2rml.api.MappingFactory
 import eu.optique.r2rml.api.binding.rdf4j.RDF4JR2RMLMappingManager
-import org.openrdf.rio.Rio
-import eu.optique.api.mapping.LogicalTable
 
 object MainR2RMLParser extends App {
 
