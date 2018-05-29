@@ -2,6 +2,7 @@ package experiments
 
 import eu.optique.r2rml.api.binding.rdf4j.RDF4JR2RMLMappingManager
 
+// CHECK R2RML parsing
 object MainR2RMLParser extends App {
 
   val manager = RDF4JR2RMLMappingManager.getInstance

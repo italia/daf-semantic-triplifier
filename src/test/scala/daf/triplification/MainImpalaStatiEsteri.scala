@@ -1,6 +1,7 @@
 package daf.triplification
 
 import org.openrdf.rio.RDFFormat
+import triplifier.processors.OntopProcessor
 
 object MainImpalaStatiEsteri extends App {
 
