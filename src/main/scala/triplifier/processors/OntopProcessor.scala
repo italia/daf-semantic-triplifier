@@ -1,8 +1,9 @@
-package daf.triplification
+
+
+package triplifier.processors
 
 import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
-import java.sql.DriverManager
 import it.unibz.inf.ontop.owlrefplatform.core.QuestPreferences
 import org.openrdf.model.ValueFactory
 import java.io.OutputStream
@@ -16,7 +17,6 @@ import org.openrdf.rio.Rio
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 import java.nio.file.Paths
-import java.io.FileOutputStream
 import java.nio.file.Files
 import scala.util.Random
 import scala.collection.JavaConversions._
@@ -29,15 +29,10 @@ import org.openrdf.model.impl.LinkedHashModel
 import org.openrdf.rio.RDFParser
 import org.openrdf.rio.helpers.StatementCollector
 import java.io.ByteArrayInputStream
-import java.io.FileInputStream
-import java.io.File
-import scala.io.Source
 import com.typesafe.config.ConfigFactory
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.openrdf.rio.WriterConfig
-import org.openrdf.rio.RioSetting
 
 object OntopProcessor {
 
@@ -55,8 +50,8 @@ object OntopProcessor {
     new OntopProcessor(_conf)
 
   }
-  
-   def impala = {
+
+  def impala = {
 
     val _conf = ConfigFactory.parseString("""
 

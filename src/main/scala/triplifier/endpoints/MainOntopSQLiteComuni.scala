@@ -1,14 +1,11 @@
-package daf.triplification
+package triplifier.endpoints
 
 import org.openrdf.rio.RDFFormat
 import java.io.FileOutputStream
 import java.io.File
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import org.openrdf.rio.Rio
-import org.openrdf.repository.sail.SailRepository
-import org.openrdf.sail.memory.MemoryStore
+import triplifier.processors.OntopProcessor
 
 object MainOntopSQLiteComuni extends App {
 
