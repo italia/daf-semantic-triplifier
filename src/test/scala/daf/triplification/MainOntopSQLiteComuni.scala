@@ -10,22 +10,18 @@ import org.openrdf.rio.Rio
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
 
-object MainOntopSQLite extends App {
+object MainOntopSQLiteComuni extends App {
 
-  val dump_file = "target/EXPORT/DUMP.nt"
+  val dump_file = "target/EXPORT/DUMP_comuni.nt"
 
-  val ontop = new OntopProcessor
+  val ontop = OntopProcessor.sqlite
 
   val mappings = List(
-    R2RMLQueries.comuni_comuni,
-    R2RMLQueries.comuni_province,
-    R2RMLQueries.comuni_regioni)
+    R2RMLComuni.comuni_comuni,
+    R2RMLComuni.comuni_province,
+    R2RMLComuni.comuni_regioni)
 
   val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
-
-  // CHECK namespaces
-  val namespaces = r2rml_model.getNamespaces
-  println("namespaces\n\t" + namespaces.mkString("\n\t"))
 
   val fos = new FileOutputStream(new File(dump_file))
   ontop.dump(mappings, fos, RDFFormat.TURTLE)
@@ -39,7 +35,7 @@ object MainOntopSQLite extends App {
 
 }
 
-object R2RMLQueries {
+private object R2RMLComuni {
 
   def comuni_regioni = """
 
