@@ -1,0 +1,80 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+
+
+@base  <https://w3id.org/italia/> .
+
+<VIEW_regioni> rr:sqlQuery """
+		
+	SELECT DISTINCT 
+	ISTAT.denominazione_regione AS "__REGION_NAME",
+	LOWER(REPLACE(ISTAT.denominazione_regione, " ", "-")) AS "__REGION_ID",
+	SUBSTR('00'||ISTAT.codice_regione, -2, 2) AS "__REGION_CODE",
+	ISTAT.codice_nuts2_2006 AS "__NUTS_2006_2" 
+	FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT
+		 
+"""
+.
+
+ 
+<TriplesMap_Region> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_regioni> ;
+	
+	rr:subjectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'__REGION_CODE'}" ;
+		rr:class skos:Concept, clvapit:Region, clvapit:Feature, clvapit:AddressComponent, clvapit:NamedAddressComponent ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate l0:name ; 
+	  rr:objectMap [ rr:column "__REGION_NAME" ; rr:language "it" ]
+	] ;
+
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:situatedWithin ; 
+	  rr:objectMap [ 
+	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA" ;
+	  	rr:termType rr:IRI ;
+	  ] 
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:hasIdentifier ; 
+	  rr:objectMap [
+	  	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/cr-{'__REGION_CODE'}" ;
+	  	rr:termType rr:IRI ;
+	  ] 
+	] ;
+		
+ .
+
+ 
+ <TriplesMap_RegionIdentifier> a rr:TriplesMapClass ;
+	
+	rr:logicalTable <VIEW_regioni> ;
+	
+	rr:subjectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/cr-{'__REGION_CODE'}" ;
+		rr:class clvapit:Identifier ;
+	] ;
+	
+	rr:predicateObjectMap [ 
+	  rr:predicate l0:identifier ; 
+	  rr:objectMap [ rr:column "__REGION_CODE" ]
+	] ;
+
+	rr:predicateObjectMap [ 
+	  rr:predicate clvapit:identifierType ; 
+	  rr:objectMap [ rr:constant "Codice Regione" ] 
+	] ;
+	
+	# rr:predicateObjectMap [ 
+	#  rr:predicate owl:sameAs ; 
+	#  rr:objectMap [ rr:template "http://nuts.geovocab.org/id/{__NUTS_2006_2}" ]; 
+	# ] ;
+		
+ .

@@ -34,6 +34,9 @@ import org.openrdf.query.resultio.BasicQueryWriterSettings
 import org.openrdf.rio.helpers.XMLWriterSettings
 import info.aduna.iteration.Iterations
 
+/*
+ * REVIEW: 
+ */
 object TestingSQLiteOntop extends App {
 
   val logger = LoggerFactory.getLogger(this.getClass)
@@ -62,8 +65,8 @@ object TestingSQLiteOntop extends App {
 
   // -------------------------------------------------------------------------------
 
-  val dump_file = "target/EXPORT/regioni.ttl"
-  val r2rmlFile = new File("src/test/resources/r2rml/poc_regioni.r2rml.ttl").getAbsoluteFile;
+  val dump_file = "target/EXPORT/poc_regioni.ttl"
+  val r2rmlFile = new File("src/test/resources/r2rml/anpr/poc_regioni.r2rml.ttl").getAbsoluteFile;
 
   val r2rmlModel = loadR2RML(r2rmlFile.toString());
 

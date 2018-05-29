@@ -20,17 +20,22 @@ class RDF4JPrettyTurtleWriter(fos: OutputStream) extends TurtleWriter(fos) {
   config.set[JBoolean](BasicWriterSettings.RDF_LANGSTRING_TO_LANG_LITERAL, true)
   config.set[JBoolean](BasicWriterSettings.XSD_STRING_TO_PLAIN_LITERAL, true)
 
-  // TODO: externalize configs for namespaces
-  // TODO: extract namespaces from Seq[Stream]
-  this.handleNamespace("skos", "http://www.w3.org/2004/02/skos/core#")
-  this.handleNamespace("l0", "https://w3id.org/italia/onto/l0/")
-  this.handleNamespace("clvapit", "https://w3id.org/italia/onto/CLV/")
-  this.handleNamespace("countries", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/")
-  this.handleNamespace("regions", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/")
-  this.handleNamespace("provinces", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/")
-  this.handleNamespace("cities", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/")
-  this.handleNamespace("identifiers", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
-
   this.setWriterConfig(config)
+
+  override def handleNamespace(prefix: String, name: String) {
+
+    // TODO: review curie serialization for turtle...
+    // TODO: externalize configs for namespaces
+    // TODO: extract namespaces from Seq[Stream]
+    super.handleNamespace("skos", "http://www.w3.org/2004/02/skos/core#")
+    super.handleNamespace("l0", "https://w3id.org/italia/onto/l0/")
+    super.handleNamespace("clvapit", "https://w3id.org/italia/onto/CLV/")
+    super.handleNamespace("countries", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/")
+    super.handleNamespace("regions", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/")
+    super.handleNamespace("provinces", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/")
+    super.handleNamespace("cities", "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/")
+    super.handleNamespace("identifiers", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
+
+  }
 
 }

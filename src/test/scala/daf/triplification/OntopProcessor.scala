@@ -39,6 +39,40 @@ import scala.collection.JavaConverters._
 import org.openrdf.rio.WriterConfig
 import org.openrdf.rio.RioSetting
 
+object OntopProcessor {
+
+  def sqlite = {
+
+    val _conf = ConfigFactory.parseString("""
+    
+      jdbc.driver = "org.sqlite.JDBC"
+      jdbc.dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+      jdbc.user = "aserafini"
+      jdbc.password = "openD4ti"
+      
+    """)
+
+    new OntopProcessor(_conf)
+
+  }
+  
+   def impala = {
+
+    val _conf = ConfigFactory.parseString("""
+
+      jdbc.driver = "com.cloudera.impala.jdbc41.Driver"
+      jdbc.dsn = "jdbc:impala://slave4.platform.daf.gov.it:21050;SSL=1;SSLKeyStore=C:/Users/Al.Serafini/awavedev/progetti/DAF/ssl_impala/master-impala.jks;SSLKeyStorePwd=Ahdai5th;AuthMech=3;CAIssuedCertNamesMismatch=1"
+      jdbc.user = "aserafini"
+      jdbc.password = "openD4ti"
+      
+    """)
+
+    new OntopProcessor(_conf)
+
+  }
+
+}
+
 /**
  *
  * REFACTORIZATION
@@ -46,16 +80,7 @@ import org.openrdf.rio.RioSetting
  * [work-in-progress]
  *
  */
-class OntopProcessor() {
-
-  val conf: Config = ConfigFactory.parseString("""
-    
-    jdbc.driver = "org.sqlite.JDBC"
-    jdbc.dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
-    jdbc.user = "aserafini"
-    jdbc.password = "openD4ti"
-    
-  """)
+class OntopProcessor(conf: Config) {
 
   val jdbc_driver = conf.getString("jdbc.driver")
   val jdbc_dsn = conf.getString("jdbc.dsn")
@@ -99,6 +124,9 @@ class OntopProcessor() {
 
     val r2rmlModel = loadR2RMLString(r2rml) // TODO: manage baseURI by configuration!
 
+    // CHECK namespaces
+    val namespaces = r2rmlModel.getNamespaces
+
     val triplesMaps = this.triplesMaps(r2rmlModel)
 
     logger.info("\nRDF mapping, using TripleMap definitions:")
@@ -109,6 +137,17 @@ class OntopProcessor() {
     if (!repo.isInitialized()) repo.initialize()
 
     val conn: RepositoryConnection = repo.getConnection()
+
+    // adds the available prefixes/namespaces definitions
+    namespaces.map { ns => conn.setNamespace(ns.getPrefix, ns.getName) }
+    conn.setNamespace("itid", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
+
+    //  rr :: http://www.w3.org/ns/r2rml#
+    //	skos :: http://www.w3.org/2004/02/skos/core#
+    //	l0 :: https://w3id.org/italia/onto/l0/
+    //	clvapit :: https://w3id.org/italia/onto/CLV/
+    //	tiapit :: https://w3id.org/italia/onto/TI/
+
     vf = conn.getValueFactory
 
     val statements = Iterations.asList(conn.getStatements(null, null, null, true)).toStream
@@ -171,14 +210,12 @@ class OntopProcessor() {
 
   }
 
-  def createOWLOntology(): OWLOntology = {
+  private def createOWLOntology(): OWLOntology = {
 
     val owlManager = OWLManager.createOWLOntologyManager()
     owlManager.createOntology()
 
   }
-
-  //  CHECK: def loadOWLOntology(owlFile: String): OWLOntology
 
   def loadR2RMLString(r2rml: String, baseURI: String = "test://memory/"): Model = {
 
