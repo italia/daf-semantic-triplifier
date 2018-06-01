@@ -28,6 +28,22 @@ import java.io.InputStream
 import java.io.FileOutputStream
 import org.openrdf.rio.Rio
 import javax.ws.rs.PathParam
+import javax.ws.rs.Consumes
+import org.glassfish.jersey.media.multipart.FormDataParam
+import scala.io.Source
+import javax.ws.rs.POST
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
+import scala.util.parsing.json.JSON
+import it.almawave.linkeddata.kb.utils.JSON
+import java.net.URLDecoder
+import javax.ws.rs.core.MultivaluedMap
+import com.typesafe.config.Config
+import javax.ws.rs.ext.MessageBodyReader
+import java.lang.annotation.Annotation
+import java.lang.reflect.Type
+
+import com.typesafe.config.ConfigFactory
+import io.swagger.models.parameters.BodyParameter
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -38,61 +54,98 @@ class StatelessEndpoint {
   @Context
   var uriInfo: UriInfo = null
 
-  @GET
+  //CHECK file upload
+  //@FormDataParam("r2rml") is:                  InputStream,
+  //@FormDataParam("r2rml") header:              FormDataContentDisposition,
+
+  @POST
+  @Path("/process")
+  @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED)) //  
+  //  @Consumes(Array(MediaType.MULTIPART_FORM_DATA))
   @Produces(Array(MediaType.TEXT_PLAIN))
-  @ApiOperation(nickname = "toRDF", value = "stateless triplifier endpoint")
-  @Path("/{datasetID}.{ext}")
-  def process(
-    @PathParam("datasetID") datasetID: String,
-    @PathParam("ext") ext:             String) = {
+  def createRDFByMapping(
+    @FormDataParam("config") config: String,
+    @FormDataParam("r2rml") r2rml:   String,
+    @FormDataParam("format") mime:   String,
+    @Context req:                    Request) = {
 
-    val base_uri = uriInfo.getBaseUri
+    val _config = URLDecoder.decode(config, "UTF-8")
 
-    val dump_file = "./target/EXPORT/DUMP_comuni.nt"
+    println("\n\n...............................")
+    println("\n\nCONFIG" + _config)
+    println("...............................\n\n")
 
-    val ontop = OntopProcessor.sqlite
+    val r2rml_input = r2rml
 
-    val mappings = List(
-      //      R2RMLComuni.comuni_comuni,
-      //      R2RMLComuni.comuni_province,
-      R2RMLComuni.comuni_regioni)
+    val rdf_format = getFormat(mime)
+    println("\n\nrequested format: " + mime)
+    println("requested format: " + rdf_format + "\n\n")
 
-    val rdf_format = Rio.getParserFormatForFileName(s"${datasetID}.${ext}")
-    println("\n\n\n\nRDF FORMAT:" + rdf_format, datasetID, ext)
+    println(s"R2RML mapping: ${r2rml_input}")
 
-    val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
+    val ontop = OntopProcessor.parse(config)
+
+    val mappings = List(R2RMLComuni.comuni_regioni)
 
     val stream = new StreamingOutput {
       def write(out: OutputStream) {
-        ontop.dump(mappings, out, rdf_format)
+        ontop.dump(r2rml_input, out, rdf_format)
         out.flush()
         out.close()
       }
     }
 
-    //    val baos = new ByteArrayOutputStream
-    //    ontop.dump(mappings, baos, RDFFormat.TURTLE)
-    //    baos.flush()
-    //
-    //    Response.ok(baos.toString()).build()
-
     Response.ok().entity(stream).`type`(MediaType.TEXT_PLAIN).build()
 
   }
 
-  def pipe(is: InputStream, os: OutputStream) {
-
-    val buffer = Array[Byte]()
-    var n = 0
-    while (n > -1) {
-
-      n = is.read()
-      os.write(buffer, 0, n)
-
-    }
-
-    os.close();
+  def getFormat(mime: String) = {
+    val format = URLDecoder.decode(mime, "UTF-8")
+    Rio.getWriterFormatForMIMEType(format, RDFFormat.NTRIPLES)
   }
 
-}
+  def readInputstream(is: InputStream): String = {
+    val src = Source.fromInputStream(is)("UTF-8")
+    val content = src.getLines().mkString("\n")
+    src.close()
+    content
+  }
 
+  //  REVIEW
+  //  @GET
+  //  @Produces(Array(MediaType.TEXT_PLAIN))
+  //  @ApiOperation(nickname = "toRDF", value = "test - stateless triplifier endpoint")
+  //  @Path("/{datasetID}.{ext}")
+  //  def test_process(
+  //    @PathParam("datasetID") datasetID: String,
+  //    @PathParam("ext") ext:             String) = {
+  //
+  //    val base_uri = uriInfo.getBaseUri
+  //
+  //    val dump_file = "./target/EXPORT/DUMP_comuni.nt"
+  //
+  //    val ontop = OntopProcessor.sqlite
+  //
+  //    val mappings = List(
+  //      //      R2RMLComuni.comuni_comuni,
+  //      //      R2RMLComuni.comuni_province,
+  //      R2RMLComuni.comuni_regioni)
+  //
+  //    val rdf_format = Rio.getParserFormatForFileName(s"${datasetID}.${ext}")
+  //    println("\n\n\n\nRDF FORMAT:" + rdf_format, datasetID, ext)
+  //
+  //    //    val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
+  //
+  //    val stream = new StreamingOutput {
+  //      def write(out: OutputStream) {
+  //        ontop.dump(mappings, out, rdf_format)
+  //        out.flush()
+  //        out.close()
+  //      }
+  //    }
+  //
+  //    Response.ok().entity(stream).`type`(MediaType.TEXT_PLAIN).build()
+  //
+  //  }
+
+}
