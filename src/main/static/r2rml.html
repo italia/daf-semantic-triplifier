@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>testing R2RML</title>
+</head>
+<body>
+
+	<form action="http://localhost:7777/kb/api/v1/triplify/process"
+		method="post">
+
+		<input type="submit" value="create RDF" /> <label>config</label>
+		<fieldset>
+			<textarea rows="14" cols="120" name="config"></textarea>
+		</fieldset>
+
+		<label>R2RML</label>
+		<fieldset>
+			<textarea rows="14" cols="120" name="r2rml"></textarea>
+		</fieldset>
+
+		<input type="text" value="nt" name="format" />
+
+
+	</form>
+
+</body>
+</html>

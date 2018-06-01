@@ -33,8 +33,16 @@ import com.typesafe.config.ConfigFactory
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.openrdf.rio.WriterConfig
+import com.typesafe.config.ConfigParseOptions
+import com.typesafe.config.ConfigSyntax
 
 object OntopProcessor {
+
+  val options = ConfigParseOptions.defaults().setAllowMissing(true).setSyntax(ConfigSyntax.CONF)
+
+  def parse(conf: String) = new OntopProcessor(ConfigFactory.parseString(conf, options).resolve())
+
+  def apply(conf: Config) = new OntopProcessor(conf)
 
   def sqlite = {
 
@@ -75,7 +83,9 @@ object OntopProcessor {
  * [work-in-progress]
  *
  */
-class OntopProcessor(conf: Config) {
+class OntopProcessor(config: Config) {
+
+  val conf = config.resolve()
 
   val jdbc_driver = conf.getString("jdbc.driver")
   val jdbc_dsn = conf.getString("jdbc.dsn")
