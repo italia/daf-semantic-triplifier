@@ -4,25 +4,47 @@
 <meta charset="UTF-8">
 <title>testing R2RML</title>
 </head>
-<body>
+<body class="container">
 
-	<form action="http://localhost:7777/kb/api/v1/triplify/process"
-		method="post">
+	<div class="col-md-12">
 
-		<input type="submit" value="create RDF" /> <label>config</label>
-		<fieldset>
-			<textarea rows="14" cols="120" name="config"></textarea>
-		</fieldset>
+		<form role="form" class="form-area"
+			action="http://localhost:7777/kb/api/v1/triplify/process" method="post">
 
-		<label>R2RML</label>
-		<fieldset>
-			<textarea rows="14" cols="120" name="r2rml"></textarea>
-		</fieldset>
+			<fieldset>
+				<label for="config">config</label>
+				<textarea class="form-control" rows="8" cols="120" name="config" placeholder="configuration" required></textarea>
 
-		<input type="text" value="nt" name="format" />
+				<label for="r2rml">R2RML</label>
+				<textarea class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping" required></textarea>
+
+				<label for="format">format</label>
+				<input class="form-control" type="text" name="format" value="text/turtle"  placeholder="RDF format (MIME)" required />
+			
+			</fieldset>
+
+			<input class="btn btn-primary pull-right" type="submit" value="create RDF" />
+
+		</form>
 
 
-	</form>
+	</div>
+
+
+	<!-- bootstrap -->
+	<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+		crossorigin="anonymous" />
+	<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+		integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+		crossorigin="anonymous" />
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+		crossorigin="anonymous"></script>
+
 
 </body>
 </html>
