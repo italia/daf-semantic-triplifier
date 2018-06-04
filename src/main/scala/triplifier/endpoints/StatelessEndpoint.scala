@@ -44,6 +44,7 @@ import java.lang.reflect.Type
 
 import com.typesafe.config.ConfigFactory
 import io.swagger.models.parameters.BodyParameter
+import javax.ws.rs.FormParam
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -54,20 +55,21 @@ class StatelessEndpoint {
   @Context
   var uriInfo: UriInfo = null
 
+  // TODO: handle errors
+
   //CHECK file upload
   //@FormDataParam("r2rml") is:                  InputStream,
   //@FormDataParam("r2rml") header:              FormDataContentDisposition,
 
   @POST
   @Path("/process")
-  @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED)) //  
-  //  @Consumes(Array(MediaType.MULTIPART_FORM_DATA))
+  @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
   def createRDFByMapping(
-    @FormDataParam("config") config: String,
-    @FormDataParam("r2rml") r2rml:   String,
-    @FormDataParam("format") mime:   String,
-    @Context req:                    Request) = {
+    @FormParam("config") config: String,
+    @FormParam("r2rml") r2rml:   String,
+    @FormParam("format") mime:   String,
+    @Context req:                Request) = {
 
     val _config = URLDecoder.decode(config, "UTF-8")
 

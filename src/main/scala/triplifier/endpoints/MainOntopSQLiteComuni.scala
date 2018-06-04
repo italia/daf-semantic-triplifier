@@ -19,6 +19,9 @@ object MainOntopSQLiteComuni extends App {
     R2RMLComuni.comuni_province,
     R2RMLComuni.comuni_comuni)
 
+  //  println(mappings.mkString("\n"))
+  //  System.exit(0)
+
   val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
 
   val fos = new FileOutputStream(new File(dump_file))
