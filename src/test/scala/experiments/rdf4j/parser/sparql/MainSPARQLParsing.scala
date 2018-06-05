@@ -1,4 +1,4 @@
-package experiments.sparql
+package experiments.rdf4j.parser.sparql
 
 import org.openrdf.query.QueryLanguage
 import org.openrdf.query.parser.QueryParserUtil
@@ -13,17 +13,26 @@ import scala.collection.JavaConverters._
 object MainSPARQLParsing extends App {
 
   val baseURI = "http://example.org"
-  val queryString = """SELECT * WHERE { ?s ?p ?o }"""
+  val queryString = """
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/> 
+    SELECT DISTINCT ?first_name ?last_name   
+    WHERE { 
+      ?person a foaf:Person .
+      ?person foaf:firstName ?first_name . 
+      ?person foaf:lastName ?last_name .
+    }
+  """
 
   val pq: ParsedQuery = QueryParserUtil.parseQuery(QueryLanguage.SPARQL, queryString, baseURI)
 
   val parseTree: ASTQueryContainer = SyntaxTreeBuilder.parseQuery(queryString)
 
   val nodes = parseTree.jjtGetChildren().toList
-  
-  nodes.foreach{ node => 
+
+  nodes.foreach { node =>
     println(node)
   }
 
+  //  TODO: JSON marshalling of tree
 
 }

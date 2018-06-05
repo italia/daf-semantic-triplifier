@@ -30,7 +30,7 @@ import scala.util.Random
 import java.nio.file.Files
 import java.io.FileOutputStream
 import info.aduna.iteration.Iterations
-import daf.triplification.RDF4JPrettyTurtleWriter
+import daf.poc.rdf.RDF4JPrettyTurtleWriter
 
 object Ontop {
 

@@ -138,20 +138,11 @@ class OntopProcessor(config: Config) {
     logger.info(triplesMaps.mkString("\n"))
 
     val repo = new SesameVirtualRepo(repo_name, owlOntology, r2rmlModel, preferences)
+    // IDEA: notification sail instead of Iterations of statements
 
     if (!repo.isInitialized()) repo.initialize()
 
     val conn: RepositoryConnection = repo.getConnection()
-
-    // adds the available prefixes/namespaces definitions
-    namespaces.map { ns => conn.setNamespace(ns.getPrefix, ns.getName) }
-    conn.setNamespace("itid", "https://w3id.org/italia/controlled-vocabulary/identifiers/")
-
-    //  rr :: http://www.w3.org/ns/r2rml#
-    //	skos :: http://www.w3.org/2004/02/skos/core#
-    //	l0 :: https://w3id.org/italia/onto/l0/
-    //	clvapit :: https://w3id.org/italia/onto/CLV/
-    //	tiapit :: https://w3id.org/italia/onto/TI/
 
     vf = conn.getValueFactory
 
@@ -184,6 +175,7 @@ class OntopProcessor(config: Config) {
   def dump(r2rml_list: Seq[String], out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
 
     val statements = r2rml_list
+      .par // CHECK if works
       .flatMap { r2rml => process(r2rml) }
       .toStream
       .sortWith {
@@ -191,7 +183,7 @@ class OntopProcessor(config: Config) {
           val test1 = s"${st1.getContext}${st1.getSubject}${st1.getPredicate}"
           val test2 = s"${st2.getContext}${st2.getSubject}${st2.getPredicate}"
           test1.compareTo(test2) < 0
-      }.distinct
+      }.distinct // NOTE: distinct is needed due to a bug in this version of ontop!
 
     // CHECK
     val settings = new WriterConfig

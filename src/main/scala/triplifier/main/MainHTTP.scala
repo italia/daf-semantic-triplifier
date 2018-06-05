@@ -11,6 +11,8 @@ import it.almawave.kb.http.HTTP
  */
 object MainHTTP extends App {
 
+  // IDEA: load configuration at start
+
   // load log configuration from a fixed path
   PropertyConfigurator.configure("./conf/log4j.properties")
 

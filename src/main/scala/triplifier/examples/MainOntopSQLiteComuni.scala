@@ -1,4 +1,4 @@
-package triplifier.endpoints
+package triplifier.examples
 
 import org.openrdf.rio.RDFFormat
 import java.io.FileOutputStream
@@ -9,36 +9,35 @@ import triplifier.processors.OntopProcessor
 
 object MainOntopSQLiteComuni extends App {
 
-  val dump_file = "target/EXPORT/DUMP_comuni.nt"
+  val dump_file_name = "target/EXPORT/DUMP_comuni.nt"
+  val dump_file = new File(dump_file_name).getAbsoluteFile
+  if (!dump_file.getParentFile.exists()) dump_file.getParentFile.mkdirs()
 
   val ontop = OntopProcessor.sqlite
 
   val mappings = List(
-    R2RMLComuni.comuni_citta_metropolitane,
-    R2RMLComuni.comuni_regioni,
-    R2RMLComuni.comuni_province,
-    R2RMLComuni.comuni_comuni)
-
-  //  println(mappings.mkString("\n"))
-  //  System.exit(0)
+    R2RMLComuniSQLite.citta_metropolitane,
+    R2RMLComuniSQLite.regioni,
+    R2RMLComuniSQLite.province,
+    R2RMLComuniSQLite.comuni)
 
   val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
 
-  val fos = new FileOutputStream(new File(dump_file))
+  val fos = new FileOutputStream(dump_file)
   ontop.dump(mappings, fos, RDFFormat.TURTLE)
   fos.flush()
   fos.close()
 
   // TODO: MOCK SPARQL in.memory
 
-  val preview = ontop.previewDump(dump_file)
+  val preview = ontop.previewDump(dump_file_name)
   println(preview, 100, 200)
 
 }
 
-private object R2RMLComuni {
+object R2RMLComuniSQLite {
 
-  def comuni_regioni = """
+  def regioni = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -46,6 +45,8 @@ private object R2RMLComuni {
     @prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
     
     @base  <https://w3id.org/italia/> .
+    
+    # REGIONI 
     
     <VIEW_regioni> rr:sqlQuery "
       
@@ -58,7 +59,7 @@ private object R2RMLComuni {
     "
     .
     
-    <TriplesMap_SiglaAutomobilistica> a rr:TriplesMapClass ;
+    <TriplesMap_CodiceRegione> a rr:TriplesMapClass ;
     
       rr:logicalTable <VIEW_regioni> ;
       
@@ -105,7 +106,7 @@ private object R2RMLComuni {
     	] ;
     	
     	rr:predicateObjectMap [ 
-    	  rr:predicate clvapit:situatedWithin ; 
+    	  rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ; 
     	  rr:objectMap [ 
     	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA" ;
     	  	rr:termType rr:IRI ;
@@ -124,7 +125,7 @@ private object R2RMLComuni {
      
   """
 
-  def comuni_citta_metropolitane = """
+  def citta_metropolitane = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -133,6 +134,8 @@ private object R2RMLComuni {
     @prefix nuts: <http://nuts.geovocab.org/id/> .
     
     @base  <https://w3id.org/italia/> .
+    
+    # CITTA METROPOLITANE 
     
     <VIEW_citta_metropolitane> rr:sqlQuery "
       
@@ -205,7 +208,7 @@ private object R2RMLComuni {
     	] ;
     	
       rr:predicateObjectMap [ 
-    	  rr:predicate clvapit:situatedWithin ; 
+    	  rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ; 
     	  rr:objectMap [ 
     	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
     	  	rr:termType rr:IRI ;
@@ -232,7 +235,7 @@ private object R2RMLComuni {
     
   """
 
-  def comuni_province = """
+  def province = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -241,6 +244,8 @@ private object R2RMLComuni {
     @prefix nuts: <http://nuts.geovocab.org/id/> .
     
     @base  <https://w3id.org/italia/> .    
+    
+    # PROVINCE 
     
     <VIEW_province> rr:sqlQuery "
       
@@ -304,7 +309,7 @@ private object R2RMLComuni {
     	] ;
     	
       rr:predicateObjectMap [ 
-    	  rr:predicate clvapit:situatedWithin ; 
+    	  rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ;
     	  rr:objectMap [ 
     	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
     	  	rr:termType rr:IRI ;
@@ -331,7 +336,7 @@ private object R2RMLComuni {
      
   """
 
-  def comuni_comuni = """
+  def comuni = """
 
     @prefix rr: <http://www.w3.org/ns/r2rml#> .
     @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -340,6 +345,8 @@ private object R2RMLComuni {
     @prefix tiapit: <https://w3id.org/italia/onto/TI/> .
     
     @base  <https://w3id.org/italia/> .
+    
+    # COMUNI
     
     <VIEW_comuni_view_sqlite> rr:sqlQuery "
     
@@ -384,7 +391,7 @@ private object R2RMLComuni {
       rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; 
       
       rr:subjectMap [ 
-    		rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/{'_DATA_ISTITUZIONE'}:{'_DATA_CESSAZIONE'}" ;
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
     		rr:class tiapit:TimeInterval ;
     	] ;
     	rr:predicateObjectMap [ 
@@ -392,7 +399,7 @@ private object R2RMLComuni {
         rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; ]
       ] ;
       rr:predicateObjectMap [ 
-        rr:predicate clvapit:endTime ; 
+        rr:predicate tiapit:endTime ; 
         rr:objectMap [ rr:column "_DATA_CESSAZIONE" ; ]
       ] ;
       
@@ -458,18 +465,15 @@ private object R2RMLComuni {
     
     <TriplesMap_Comuni> a rr:TriplesMapClass ;
     
-      # rr:logicalTable <VIEW_comuni> ;
-    	# rr:logicalTable <VIEW_comuni_view_sqlite> ;
-    	
-    	rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; # HACK locale per le date
+      rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; # HACK locale per le date
     	    	
     	rr:subjectMap [ 
-    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_CODICE_ISTAT'}/{'_DATA_ISTITUZIONE'}" ;
+    		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_CODICE_ISTAT'}-({'_DATA_ISTITUZIONE'})" ;
     		rr:class skos:Concept, clvapit:City ;
     	] ;
     	
       rr:predicateObjectMap [ 
-    	  rr:predicate clvapit:situatedWithin ; 
+    	  rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ; 
     	  rr:objectMap [ 
     	  	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_CODICE_PROVINCIA'}" ;
     	  	rr:termType rr:IRI ;
@@ -511,7 +515,7 @@ private object R2RMLComuni {
     	rr:predicateObjectMap [ 
     	  rr:predicate clvapit:hasSOValidity ; 
     	  rr:objectMap [ 
-    		  rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/{'_DATA_ISTITUZIONE'}:{'_DATA_CESSAZIONE'}" ;
+    		  rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
     	  	rr:termType rr:IRI ;
     	  ] 
     	] ;
