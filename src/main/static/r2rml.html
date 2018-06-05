@@ -9,27 +9,47 @@
 	<div class="col-md-12">
 
 		<form role="form" class="form-area"
-			action="http://localhost:7777/kb/api/v1/triplify/process" method="post">
+			action="http://localhost:7777/kb/api/v1/triplify/process"
+			method="post">
 
 			<fieldset>
 				<label for="config">config</label>
-				<textarea class="form-control" rows="8" cols="120" name="config" placeholder="configuration" required></textarea>
+				<textarea class="form-control" rows="8" cols="120" name="config"
+					placeholder="configuration" required>
+jdbc.driver = "org.sqlite.JDBC"
+jdbc.dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+jdbc.user = "aserafini"
+jdbc.password = "openD4ti"
+				</textarea>
 
 				<label for="r2rml">R2RML</label>
-				<textarea class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping" required></textarea>
+				<textarea id="r2rml" class="form-control" rows="8" cols="120"
+					name="r2rml" placeholder="R2RML mapping"></textarea>
 
-				<label for="format">format</label>
-				<input class="form-control" type="text" name="format" value="text/turtle"  placeholder="RDF format (MIME)" required />
-			
+				<label for="format">format</label> <select name="format">
+					<option selected="selected" value="text/turtle">ttl</option>
+					<option value="text/plain; ext=nt">nt</option>
+					<!-- TODO: add parsers dependencies -->
+					<!-- <option value="application/rdf+xml">rdf</option> -->
+					<!-- <option value="application/ld+json; ext=jsonld">jsonld</option> -->
+				</select>
+
+
 			</fieldset>
 
-			<input class="btn btn-primary pull-right" type="submit" value="create RDF" />
+			<input class="pull-right btn btn-default" type="submit"
+				value="create RDF" />
 
 		</form>
 
 
 	</div>
 
+
+	<!-- jquery -->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+		crossorigin="anonymous"></script>
 
 	<!-- bootstrap -->
 	<link rel="stylesheet"
@@ -44,6 +64,17 @@
 		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
 		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
 		crossorigin="anonymous"></script>
+
+	<!-- YATE -->
+	<link href="https://perfectkb.github.io/yate/dist/yate.min.css"
+		rel="stylesheet" type="text/css" />
+	<link href="https://perfectkb.github.io/yate/doc/doc.min.css"
+		rel="stylesheet" type="text/css" />
+	<script src="https://perfectkb.github.io/yate/dist/yate.bundled.min.js"></script>
+	<script src="https://perfectkb.github.io/yate/doc/doc.min.js"></script>
+	<script type="text/javascript">
+		var yate = YATE.fromTextArea(document.getElementById('r2rml'))
+	</script>
 
 
 </body>

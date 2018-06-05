@@ -1,4 +1,4 @@
-package daf.triplification
+package daf.poc.rdf
 
 import org.openrdf.rio.RDFFormat
 import triplifier.processors.OntopProcessor

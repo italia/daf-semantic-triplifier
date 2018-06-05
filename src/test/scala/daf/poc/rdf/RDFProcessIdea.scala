@@ -1,4 +1,4 @@
-package daf.triplification
+package daf.poc.rdf
 
 import java.io.OutputStream
 import org.openrdf.model.Statement
