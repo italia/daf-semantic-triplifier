@@ -1,4 +1,4 @@
-package wip.impala
+package wip.impala.remove
 
 import java.io.ByteArrayInputStream
 import java.io.File
