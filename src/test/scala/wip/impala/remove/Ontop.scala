@@ -1,4 +1,4 @@
-package wip.impala
+package wip.impala.remove
 
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
