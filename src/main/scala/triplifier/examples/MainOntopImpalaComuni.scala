@@ -17,10 +17,10 @@ object MainOntopImpalaComuni extends App {
 
   val mappings = List(R2RMLComuniImpala.regioni)
 
-  val r2rml_model = ontop.loadR2RMLString(mappings.mkString("\n"))
+  val r2rml_model = ontop.loadTurtle(mappings.mkString("\n"))
 
   val fos = new FileOutputStream(dump_file)
-  ontop.dump(mappings, fos, RDFFormat.TURTLE)
+  ontop.dump(mappings)(None)(fos, RDFFormat.TURTLE)
   fos.flush()
   fos.close()
 
