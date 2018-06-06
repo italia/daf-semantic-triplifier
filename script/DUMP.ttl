@@ -1,0 +1,100 @@
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/10> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITE2> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Umbria"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/11> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITE3> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Marche"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/12> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITE4> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Lazio"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/13> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITF1> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Abruzzo"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/14> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITF2> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Molise"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/15> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITF3> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Campania"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/16> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITF4> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Puglia"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/17> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITF5> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Basilicata"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/18> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITF6> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Calabria"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/19> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITG1> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Sicilia"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/1> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITC1> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Piemonte"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/20> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITG2> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Sardegna"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/2> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITC2> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Valle d'Aosta/Vallée d'Aoste"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/3> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITC4> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Lombardia"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/4> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITD1> , <http://nuts.geovocab.org/id/ITD2> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Trentino-Alto Adige/Südtirol"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/5> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITD3> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Veneto"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/6> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITD4> , <http://nuts.geovocab.org/id/ITD3> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Friuli-Venezia Giulia"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/7> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITC3> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Liguria"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/8> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITD5> , <http://nuts.geovocab.org/id/ITE3> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Emilia-Romagna"@it .
+
+<https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/9> a <https://w3id.org/italia/onto/CLV/Region> , <http://www.w3.org/2004/02/skos/core#Concept> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://nuts.geovocab.org/id/ITE1> ;
+	<https://w3id.org/italia/onto/CLV/situatedWithin> <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA> ;
+	<https://w3id.org/italia/onto/l0/name> "Toscana"@it .

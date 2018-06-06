@@ -1,5 +1,3 @@
-
-
 package triplifier.processors
 
 import com.typesafe.config.Config
@@ -30,11 +28,15 @@ import org.openrdf.rio.RDFParser
 import org.openrdf.rio.helpers.StatementCollector
 import java.io.ByteArrayInputStream
 import com.typesafe.config.ConfigFactory
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import org.openrdf.rio.WriterConfig
 import com.typesafe.config.ConfigParseOptions
 import com.typesafe.config.ConfigSyntax
+import scala.concurrent.Future
+import scala.util.Try
+import org.eclipse.rdf4j.model.ModelFactory
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 object OntopProcessor {
 
@@ -85,6 +87,8 @@ object OntopProcessor {
  */
 class OntopProcessor(config: Config) {
 
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   val conf = config.resolve()
 
   val jdbc_driver = conf.getString("jdbc.driver")
@@ -123,21 +127,25 @@ class OntopProcessor(config: Config) {
 
   var vf: ValueFactory = null
 
-  def process(r2rml: String): Seq[Statement] = {
+  def guessBaseURI() = if (config.hasPath("r2rml.baseURI")) config.getString("r2rml.baseURI") else "https://test/"
+
+  def process(
+    r2rml: String): Try[Seq[Statement]] = Try {
+
+    val baseURI = guessBaseURI
 
     val start_time = LocalDateTime.now()
 
-    val r2rmlModel = loadR2RMLString(r2rml) // TODO: manage baseURI by configuration!
+    val r2rmlModel = loadTurtle(r2rml, baseURI)
 
-    // CHECK namespaces
-    val namespaces = r2rmlModel.getNamespaces
+    // CHECK namespaces: val namespaces = r2rmlModel.getNamespaces
 
-    val triplesMaps = this.triplesMaps(r2rmlModel)
+    val triplesMaps = this.triplesMaps(r2rmlModel.get).get
 
     logger.info("\nRDF mapping, using TripleMap definitions:")
     logger.info(triplesMaps.mkString("\n"))
 
-    val repo = new SesameVirtualRepo(repo_name, owlOntology, r2rmlModel, preferences)
+    val repo = new SesameVirtualRepo(repo_name, owlOntology, r2rmlModel.get, preferences)
     // IDEA: notification sail instead of Iterations of statements
 
     if (!repo.isInitialized()) repo.initialize()
@@ -164,19 +172,21 @@ class OntopProcessor(config: Config) {
 
   }
 
-  def dump(r2rml: String, out: OutputStream, rdf_format: RDFFormat) {
-    dump(List(r2rml), out, rdf_format)
-  }
-
   /*
+   * This method is useful to create a dump of the data, on a choosen outputstream,
+   * which can be a file, a response writer, and so on.
+   *
    * TODO:
    * 	+ dump to file
+   *  + Future handling
    */
-  def dump(r2rml_list: Seq[String], out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
+  def dump(r2rml_list: Seq[String])(metadata: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
+
+    val metadata_statements: Seq[Statement] = loadTurtle(metadata.getOrElse(""), guessBaseURI).get.toStream
 
     val statements = r2rml_list
       .par // CHECK if works
-      .flatMap { r2rml => process(r2rml) }
+      .flatMap { r2rml => process(r2rml).getOrElse(List()) }
       .toStream
       .sortWith {
         (st1, st2) =>
@@ -185,14 +195,14 @@ class OntopProcessor(config: Config) {
           test1.compareTo(test2) < 0
       }.distinct // NOTE: distinct is needed due to a bug in this version of ontop!
 
-    // CHECK
-    val settings = new WriterConfig
+    // CHECK val settings = new WriterConfig for formatting, pretty-print etc
 
     // TODO: pretty print
-    Rio.write(statements, out, rdf_format)
+    Rio.write((metadata_statements ++ statements), out, rdf_format)
 
   }
 
+  /* this is an helper method, to preview a sample of the generated data */
   def previewDump(rdfFileName: String, offset: Int = -1, limit: Int = -1): String = {
 
     // VERIFY: default values for collections.slice()
@@ -207,6 +217,7 @@ class OntopProcessor(config: Config) {
 
   }
 
+  /* the creation of an OWLOntology is required by the processor, so we need to create at least an empty one */
   private def createOWLOntology(): OWLOntology = {
 
     val owlManager = OWLManager.createOWLOntologyManager()
@@ -214,20 +225,52 @@ class OntopProcessor(config: Config) {
 
   }
 
-  def loadR2RMLString(r2rml: String, baseURI: String = "test://memory/"): Model = {
+  /* this method is used for parameters injection in mappings or static metadata */
+  def injectParameters(
+    content:    String,
+    parameters: Config = ConfigFactory.empty()): String = {
+
+    logger.debug(s"\n\n using parameters: ${parameters}")
+
+    content
+      .split("\n")
+      .toStream
+      .map { line =>
+        val subs = parameters.entrySet().toList
+        var txt = line
+        subs.map { s =>
+          txt = txt.replace(s"{${s.getKey}}", s.getValue.unwrapped().toString())
+        }
+        txt
+      }
+      .mkString("\n")
+
+  }
+
+  /* this can be used to create a Model from the R2RML mapping */
+  def loadTurtle(
+    rdf_content: String,
+    baseURI:     String = "test://memory/"): Try[Model] = Try {
+
+    // parameters interpolation
+    val rdf_content_with_parameters = if (config.hasPath("parameters"))
+      injectParameters(rdf_content, config.getConfig("parameters")) // TODO: add check for parameters
+    else
+      rdf_content
 
     val rdfParser: RDFParser = Rio.createParser(RDFFormat.TURTLE)
     val r2rmlModel: Model = new LinkedHashModel()
     val collector = new StatementCollector(r2rmlModel)
     rdfParser.setRDFHandler(collector)
-    val bais = new ByteArrayInputStream(r2rml.getBytes)
+    val bais = new ByteArrayInputStream(rdf_content_with_parameters.getBytes)
     rdfParser.parse(bais, baseURI)
     bais.close()
     r2rmlModel
 
   }
 
-  def triplesMaps(r2rmlModel: Model): Seq[String] = {
+  /* gets a list of the available triplesMap */
+  def triplesMaps(r2rmlModel: Model): Try[Seq[String]] = Try {
 
     val rdf_type = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
     val triplesMapClass = "http://www.w3.org/ns/r2rml#TriplesMapClass"

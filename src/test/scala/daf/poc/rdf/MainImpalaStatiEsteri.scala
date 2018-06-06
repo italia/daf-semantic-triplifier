@@ -9,7 +9,7 @@ object MainImpalaStatiEsteri extends App {
 
   def r2rml = R2RMLStatiEsteri.stati_esteri
 
-  ontop.dump(r2rml, System.out, RDFFormat.TURTLE)
+  ontop.dump(List(r2rml))(None)(System.out, RDFFormat.TURTLE)
 
 }
 

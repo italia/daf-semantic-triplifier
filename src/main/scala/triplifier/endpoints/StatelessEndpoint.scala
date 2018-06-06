@@ -34,7 +34,6 @@ import scala.io.Source
 import javax.ws.rs.POST
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 
-import it.almawave.linkeddata.kb.utils.JSON
 import java.net.URLDecoder
 import javax.ws.rs.core.MultivaluedMap
 import com.typesafe.config.Config
@@ -50,6 +49,16 @@ import javax.ws.rs.ext.Provider
 import javax.ws.rs.ext.ExceptionMapper
 import javax.ws.rs.NotFoundException
 import scala.util.Try
+import javax.ws.rs.container.Suspended
+import javax.ws.rs.container.AsyncResponse
+import scala.util.Success
+import scala.util.Failure
+import scala.concurrent.Future
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import it.almawave.kb.http.utils.AsyncHelper._
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -60,52 +69,54 @@ class StatelessEndpoint {
   @Context
   var uriInfo: UriInfo = null
 
-  // TODO: handle errors
-
   @POST
   @Path("/process")
   @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
   def createRDFByMapping(
-    @FormParam("config") config: String,
-    @FormParam("r2rml") r2rml:   String,
-    @FormParam("format") mime:   String,
-    @Context req:                Request) = {
+    @FormParam("config") config:     String,
+    @FormParam("r2rml") r2rml:       String,
+    @FormParam("metadata") metadata: String,
+    @FormParam("name") fileName:     String,
+    @FormParam("format") mime:       String,
+    @Context req:                    Request) = {
 
-    val _config = URLDecoder.decode(config, "UTF-8")
+    Future {
 
-    println("\n\n...............................")
-    println("\n\nCONFIG" + _config)
-    println("...............................\n\n")
+      val _config = URLDecoder.decode(config, "UTF-8")
 
-    val rdf_format = getFormat(mime)
+      logger.debug(s"\n\nusing configuration:\n${_config}")
 
-    println("\n\nrequested format: " + mime)
-    println("requested format: " + rdf_format + "\n\n")
-    println(s"R2RML mapping: ${r2rml}")
+      val rdf_format = getFormat(mime)
 
-    val ontop = OntopProcessor.parse(config)
+      val meta_opt = Option(metadata)
 
-    val stream = new StreamingOutput {
-      def write(out: OutputStream) {
-        ontop.dump(r2rml, out, rdf_format)
-        out.flush()
-        out.close()
+      println(meta_opt)
+
+      logger.debug("requested format: " + rdf_format + "\n\n")
+      logger.debug(s"R2RML mapping: ${r2rml}")
+
+      val ontop = OntopProcessor.parse(config)
+
+      val stream = new StreamingOutput {
+        def write(out: OutputStream) {
+          ontop.dump(List(r2rml))(meta_opt)(out, rdf_format)
+          out.flush()
+          out.close()
+        }
       }
-    }
 
-    //    throw new RuntimeException("VERIFY EXCEPTION HANDLING...")
+      Response
+        .ok()
+        .entity(stream)
+        .`type`(MediaType.TEXT_PLAIN) // CHECK: bodywriter per RDF...
+        .encoding("UTF-8")
+        .lastModified(new Date())
+        .header("debug.configuration", _config.toString())
+        //        .header("content-disposition", s"attachment; filename = ${fileName}.${rdf_format.getDefaultFileExtension}")
+        .build()
 
-    Response
-      .ok()
-      .entity(stream)
-      .`type`(MediaType.TEXT_PLAIN) // CHECK: bodywriter per RDF...
-      .encoding("UTF-8")
-      .lastModified(new Date())
-      .header("debug.configuration", _config.toString())
-      .build()
-
-    // ??   } recover { case err => err }
+    }.await
 
   }
 
@@ -127,14 +138,3 @@ class StatelessEndpoint {
   }
 
 }
-
-
-
-
-
-//  IDEA
-//  @Path("/{datasetID}.{ext}")
-//  def test_process(
-//    @PathParam("datasetID") datasetID: String,
-//    @PathParam("ext") ext:             String) = {
-//    val base_uri = uriInfo.getBaseUri

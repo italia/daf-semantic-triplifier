@@ -11,37 +11,48 @@
 		<form role="form" class="form-area"
 			action="http://localhost:7777/kb/api/v1/triplify/process"
 			method="post">
+			
 
+			
 			<fieldset>
 				<label for="config">config</label>
-				<textarea class="form-control" rows="8" cols="120" name="config"
-					placeholder="configuration" required>
-jdbc.driver = "org.sqlite.JDBC"
-jdbc.dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
-jdbc.user = "aserafini"
-jdbc.password = "openD4ti"
+				<textarea class="form-control" rows="8" cols="120" name="config" placeholder="configuration" required>
+jdbc {
+	driver = "org.sqlite.JDBC"
+	dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+	user = "aserafini"
+	password = "openD4ti"
+}
+parameters {
+	ontologies.base = "https://w3id.org/italia/onto"
+	vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
+}
 				</textarea>
 
 				<label for="r2rml">R2RML</label>
-				<textarea id="r2rml" class="form-control" rows="8" cols="120"
-					name="r2rml" placeholder="R2RML mapping"></textarea>
+				<textarea id="r2rml" class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping"></textarea>
 
-				<label for="format">format</label> <select name="format">
+				<label for="name">name</label>
+				<input type="text" name="name" value="dump" /> 
+				
+				<label for="format">format</label>
+				<select name="format">
 					<option selected="selected" value="text/turtle">ttl</option>
 					<option value="text/plain; ext=nt">nt</option>
-					<!-- TODO: add parsers dependencies -->
-					<!-- <option value="application/rdf+xml">rdf</option> -->
-					<!-- <option value="application/ld+json; ext=jsonld">jsonld</option> -->
 				</select>
-
+				
+				<input class="pull-right btn btn-default" type="submit" value="create RDF" />
 
 			</fieldset>
 
-			<input class="pull-right btn btn-default" type="submit"
-				value="create RDF" />
-
+			<fieldset>
+				<label for="metadata">DCAT-AP_IT metadata</label>
+				<textarea id="metadata" class="form-control" rows="4" cols="120" name="metadata" placeholder="DCAT-AP_IT metadata"></textarea>
+			</fieldset>
+			
 		</form>
-
+		
+		<br/><br/>
 
 	</div>
 
@@ -73,7 +84,8 @@ jdbc.password = "openD4ti"
 	<script src="https://perfectkb.github.io/yate/dist/yate.bundled.min.js"></script>
 	<script src="https://perfectkb.github.io/yate/doc/doc.min.js"></script>
 	<script type="text/javascript">
-		var yate = YATE.fromTextArea(document.getElementById('r2rml'))
+		var yate_r2rml = YATE.fromTextArea(document.getElementById('r2rml'))
+		// RIVEDERE: var yate_dcat = YATE.fromTextArea(document.getElementById('metadata'))
 	</script>
 
 
