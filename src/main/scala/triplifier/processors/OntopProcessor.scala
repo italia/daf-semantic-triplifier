@@ -78,6 +78,23 @@ object OntopProcessor {
 
 }
 
+// TODO
+trait RDFProcessor {
+
+  def injectParameters(content: String, parameters: Config = ConfigFactory.empty()): String
+
+  def loadTurtle(rdf_content: String, baseURI: String = "test://memory/"): Try[Model]
+
+  def triplesMaps(r2rmlModel: Model): Try[Seq[String]]
+
+  def process(r2rml: String): Try[Seq[Statement]]
+
+  def dump(r2rml_list: Seq[String])(metadata: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES)
+
+  def previewDump(rdfFileName: String, offset: Int = -1, limit: Int = -1): String
+
+}
+
 /**
  *
  * REFACTORIZATION
@@ -85,7 +102,7 @@ object OntopProcessor {
  * [work-in-progress]
  *
  */
-class OntopProcessor(config: Config) {
+class OntopProcessor(config: Config) extends RDFProcessor {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -129,8 +146,7 @@ class OntopProcessor(config: Config) {
 
   def guessBaseURI() = if (config.hasPath("r2rml.baseURI")) config.getString("r2rml.baseURI") else "https://test/"
 
-  def process(
-    r2rml: String): Try[Seq[Statement]] = Try {
+  def process(r2rml: String): Try[Seq[Statement]] = Try {
 
     val baseURI = guessBaseURI
 
