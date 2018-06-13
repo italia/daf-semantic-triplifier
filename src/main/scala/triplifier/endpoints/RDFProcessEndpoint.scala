@@ -121,14 +121,13 @@ class FileDataSource(path: String) {
   val dataset_dir = Paths.get(base_path, s"${path}").toAbsolutePath().normalize()
 
   val config_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".conf") }.head
-
   val config = Files.readAllLines(config_path).mkString("\n")
-
-  val r2rml_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".r2rml.ttl") }.head
-  val r2rml = Files.readAllLines(r2rml_path).mkString("\n")
 
   val meta_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".metadata.ttl") }.head
   val meta = Files.readAllLines(meta_path).mkString("\n")
+
+  val r2rml_paths = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".r2rml.ttl") }.toList
+  val r2rmls = r2rml_paths.map { r2rml_path => Files.readAllLines(r2rml_path).mkString("\n") }.toList
 
   val ontop = OntopProcessor.parse(config)
 
@@ -136,7 +135,7 @@ class FileDataSource(path: String) {
 
     val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
     val baos = new ByteArrayOutputStream
-    ontop.dump(List(r2rml))(Option(meta))(baos, rdf_format)
+    ontop.dump(r2rmls)(Option(meta))(baos, rdf_format)
     val content = baos.toString()
     baos.close()
     content
