@@ -9,7 +9,7 @@ import it.almawave.kb.http.HTTP
 /**
  * this is just used for starting the embedded server
  */
-object MainHTTP extends App {
+object MainHTTPTriplifier extends App {
 
   // IDEA: load configuration at start
 
@@ -28,5 +28,9 @@ object MainHTTP extends App {
 
 
 //CHECK
-//http://localhost:7777/kb/api/v1/swagger.json
-//http://localhost:7777/kb/api/v1/application.wadl
+
+// http://localhost:7777/kb/api/v1/swagger.json
+// http://localhost:7777/kb/api/v1/application.wadl
+// http://localhost:7777/static/rdf-process.html
+// http://localhost:7777/static/rdf-process.html
+// http://localhost:7777/static/r2rml-guess.html

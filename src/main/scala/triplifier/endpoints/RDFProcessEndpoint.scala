@@ -59,68 +59,38 @@ import scala.concurrent.duration.Duration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import it.almawave.kb.http.utils.AsyncHelper._
+import java.nio.file.Paths
+import javax.ws.rs.DefaultValue
+import java.nio.file.Files
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import javax.ws.rs.Encoded
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
-class StatelessEndpoint {
+class RDFProcessEndpoint {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   @Context
   var uriInfo: UriInfo = null
 
-  @POST
-  @Path("/stateless/process")
+  @GET
+  @Path("/datasets/{user}/{group}/{dataset: .+?}.{ext}")
   @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
   def createRDFByMapping(
-    @FormParam("config") config:     String,
-    @FormParam("r2rml") r2rml:       String,
-    @FormParam("metadata") metadata: String,
-    @FormParam("name") fileName:     String,
-    @FormParam("format") mime:       String,
-    @Context req:                    Request) = {
+    @PathParam("user")@DefaultValue("opendata") user:                      String,
+    @PathParam("group")@DefaultValue("territorial-classifications") group: String,
+    @PathParam("dataset")@DefaultValue("regions") dataset:                 String,
+    @PathParam("ext")@DefaultValue("ttl") ext:                             String,
+    @Context req:                                                          Request) = {
 
-    Future {
+    val fs = new FileDataSource(s"${user}/${group}/${dataset}")
+    fs.getDump(ext)
 
-      val _config = URLDecoder.decode(config, "UTF-8")
-
-      logger.debug(s"\n\nusing configuration:\n${_config}")
-
-      val rdf_format = getFormat(mime)
-
-      val meta_opt = Option(metadata)
-
-      logger.debug("requested format: " + rdf_format + "\n\n")
-      logger.debug(s"R2RML mapping: ${r2rml}")
-
-      val ontop = OntopProcessor.parse(config)
-
-      val stream = new StreamingOutput {
-        def write(out: OutputStream) {
-          try {
-            ontop.dump(List(r2rml))(meta_opt)(out, rdf_format)
-          } catch {
-            case err: Throwable =>
-              logger.error(err.getStackTrace.mkString("\n"))
-          }
-          out.flush()
-          out.close()
-        }
-      }
-      // TODO: add a JUnit test for this part!
-
-      Response
-        .ok()
-        .entity(stream)
-        .`type`(MediaType.TEXT_PLAIN) // CHECK: bodywriter per RDF...
-        .encoding("UTF-8")
-        .lastModified(new Date())
-        .header("debug.configuration", _config.toString())
-        .header("content-disposition", s"attachment; filename = ${fileName}.${rdf_format.getDefaultFileExtension}")
-        .build()
-
-    }.await
+    // TODO: a better error handling
 
   }
 
@@ -142,3 +112,36 @@ class StatelessEndpoint {
   }
 
 }
+
+class FileDataSource(path: String) {
+
+  // TODO: configuration
+  val base_path = "./data" // TODO: configure RDF storage
+
+  val dataset_dir = Paths.get(base_path, s"${path}").toAbsolutePath().normalize()
+
+  val config_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".conf") }.head
+
+  val config = Files.readAllLines(config_path).mkString("\n")
+
+  val r2rml_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".r2rml.ttl") }.head
+  val r2rml = Files.readAllLines(r2rml_path).mkString("\n")
+
+  val meta_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".metadata.ttl") }.head
+  val meta = Files.readAllLines(meta_path).mkString("\n")
+
+  val ontop = OntopProcessor.parse(config)
+
+  def getDump(ext: String) = {
+
+    val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
+    val baos = new ByteArrayOutputStream
+    ontop.dump(List(r2rml))(Option(meta))(baos, rdf_format)
+    val content = baos.toString()
+    baos.close()
+    content
+  }
+
+}
+
+

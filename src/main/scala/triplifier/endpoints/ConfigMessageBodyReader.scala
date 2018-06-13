@@ -10,7 +10,7 @@ import java.io.InputStream
 import scala.io.Source
 import com.typesafe.config.ConfigFactory
 
-// ChECK
+// CHECK this example. This could be useful to handle the responses in a different way.
 class ConfigMessageBodyReader extends MessageBodyReader[Config] {
 
   override def isReadable(

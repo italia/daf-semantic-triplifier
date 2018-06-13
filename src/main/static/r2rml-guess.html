@@ -9,14 +9,14 @@
 	<div class="col-md-12">
 
 		<form role="form" class="form-area"
-			action="http://localhost:7777/kb/api/v1/triplify/process"
+			action="http://localhost:7777/kb/api/v1/triplification/r2rml/guess"
 			method="post">
 			
 
 			
 			<fieldset>
 				<label for="config">config</label>
-				<textarea class="form-control" rows="8" cols="120" name="config" placeholder="configuration" required>
+				<textarea class="form-control" rows="10" cols="120" name="config" placeholder="configuration" required>
 jdbc {
 	driver = "org.sqlite.JDBC"
 	dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
@@ -24,30 +24,41 @@ jdbc {
 	password = "openD4ti"
 }
 parameters {
+	baseURI: "https://w3id.org/italia/data"
 	ontologies.base = "https://w3id.org/italia/onto"
 	vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
 }
 				</textarea>
 
-				<label for="r2rml">R2RML</label>
-				<textarea id="r2rml" class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping"></textarea>
+				<label for="query">SQL query</label>
+				<textarea id="query" class="form-control" rows="10" cols="120" name="query" placeholder="SQL query">
+SELECT 
+codice_regione, 
+codice_citta_metropolitana, 
+codice_provincia, 
+progressivo_del_comune, 
+codice_comune_formato_alfanumerico, 
+denominazione_corrente, 
+denominazione_altra_lingua, 
+codice_ripartizione_geografica, 
+ripartizione_geografica, denominazione_regione, 
+denominazione_citta_metropolitana, 
+denominazione_provincia, 
+flag_comune_capoluogo_di_provincia, 
+sigla_automobilistica, 
+codice_comune_formato_numerico, 
+codice_comune_numerico_con_110_province_dal_2010_al_2016, 
+codice_comune_numerico_con_107_province_dal_2006_al_2009, 
+codice_comune_numerico_con_103_province_dal_1995_al_2005, 
+codice_catastale_del_comune, popolazione_legale_2011, 
+codice_nuts1_2010, codice_nuts2_2010, codice_nuts3_2010, 
+codice_nuts1_2006, codice_nuts2_2006, codice_nuts3_2006, 
+processing_dttm 
+FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani'
+				</textarea>
 
-				<label for="name">name</label>
-				<input type="text" name="name" value="dump" /> 
-				
-				<label for="format">format</label>
-				<select name="format">
-					<option selected="selected" value="text/turtle">ttl</option>
-					<option value="text/plain; ext=nt">nt</option>
-				</select>
-				
-				<input class="pull-right btn btn-default" type="submit" value="create RDF" />
+				<input class="pull-right btn btn-default" type="submit" value="create R2RML draft" />
 
-			</fieldset>
-
-			<fieldset>
-				<label for="metadata">DCAT-AP_IT metadata</label>
-				<textarea id="metadata" class="form-control" rows="4" cols="120" name="metadata" placeholder="DCAT-AP_IT metadata"></textarea>
 			</fieldset>
 			
 		</form>
@@ -84,8 +95,7 @@ parameters {
 	<script src="https://perfectkb.github.io/yate/dist/yate.bundled.min.js"></script>
 	<script src="https://perfectkb.github.io/yate/doc/doc.min.js"></script>
 	<script type="text/javascript">
-		var yate_r2rml = YATE.fromTextArea(document.getElementById('r2rml'))
-		// RIVEDERE: var yate_dcat = YATE.fromTextArea(document.getElementById('metadata'))
+		// var yate_r2rml = YATE.fromTextArea(document.getElementById('r2rml'))
 	</script>
 
 
