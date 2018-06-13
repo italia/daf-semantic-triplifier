@@ -36,7 +36,7 @@ curl -X POST 'http://localhost:7777/kb/api/v1/triplify/process' \
 ```
 
 **NOTE** that this version of the service expects the actual content of the mapping, so when using curl it's best to prepare it
-using a shell variable such as ```r2rml=`cat r2rml_file` ``` before launching curl. 
+using a shell variable such as ```r2rml=`cat r2rml_file` ``` before launching curl.
 
 The directory `/script` contains some example, which can be extended.
 
@@ -48,4 +48,33 @@ otherwise we can test the endpoint by using the example page `http://localhost:7
 * * *
 
 **SEE ALSO**: [daf-semantics](https://github.com/italia/daf-semantics) project
+
+
+* * *
+
+## running locally
+
+
+```bash
+
+mvn clean package
+
+java -cp "target/target/triplifier-0.0.2-SNAPSHOT.jar;target/libs/*" triplifier.main.MainHTTPTriplifier
+
+```
+
+
+* * *
+
+
+## TODO
+
++ update `DockerFile`
++ merge of external manual swagger definitions
++ fix swagger problems with multi-lines: try updating to version 3+
+
+
+
+
+
 

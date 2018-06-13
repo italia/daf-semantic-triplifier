@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>testing R2RML</title>
+<style type="text/css">
+h1 {
+	font: small-caps 1.4em Arial !important ;
+}
+</style>
+</head>
+<body class="container">
+
+	<div class="col-md-12">
+
+		<h1>RDF creation with R2RML</h1>
+
+		<hr/>
+
+		<form role="form" class="form-area"
+			action="/kb/api/v1/triplify/stateless/process"
+			method="post">
+			
+
+			
+			<fieldset>
+				<label for="config">config</label>
+				<textarea class="form-control" rows="8" cols="120" name="config" placeholder="configuration" required>
+jdbc {
+	driver = "org.sqlite.JDBC"
+	dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+	user = "aserafini"
+	password = "openD4ti"
+}
+parameters {
+	ontologies.base = "https://w3id.org/italia/onto"
+	vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
+}
+				</textarea>
+
+				<label for="r2rml">R2RML</label>
+				<textarea id="r2rml" class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping"></textarea>
+
+				<label for="name">name</label>
+				<input type="text" name="name" value="dump" /> 
+				
+				<label for="format">format</label>
+				<select name="format">
+					<option selected="selected" value="text/turtle">ttl</option>
+					<option value="text/plain; ext=nt">nt</option>
+				</select>
+				
+				<input class="pull-right btn btn-default" type="submit" value="create RDF" />
+
+			</fieldset>
+
+			<fieldset>
+				<label for="metadata">DCAT-AP_IT metadata</label>
+				<textarea id="metadata" class="form-control" rows="4" cols="120" name="metadata" placeholder="DCAT-AP_IT metadata"></textarea>
+			</fieldset>
+			
+		</form>
+		
+		<br/><br/>
+
+	</div>
+
+
+	<!-- jquery -->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+		crossorigin="anonymous"></script>
+
+	<!-- bootstrap -->
+	<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+		crossorigin="anonymous" />
+	<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+		integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+		crossorigin="anonymous" />
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+		crossorigin="anonymous"></script>
+
+	<!-- YATE -->
+	<link href="https://perfectkb.github.io/yate/dist/yate.min.css"
+		rel="stylesheet" type="text/css" />
+	<link href="https://perfectkb.github.io/yate/doc/doc.min.css"
+		rel="stylesheet" type="text/css" />
+	<script src="https://perfectkb.github.io/yate/dist/yate.bundled.min.js"></script>
+	<script src="https://perfectkb.github.io/yate/doc/doc.min.js"></script>
+	<script type="text/javascript">
+		var yate_r2rml = YATE.fromTextArea(document.getElementById('r2rml'))
+		// RIVEDERE: var yate_dcat = YATE.fromTextArea(document.getElementById('metadata'))
+	</script>
+
+
+</body>
+</html>

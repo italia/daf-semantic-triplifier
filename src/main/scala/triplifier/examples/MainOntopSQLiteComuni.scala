@@ -16,11 +16,10 @@ object MainOntopSQLiteComuni extends App {
   val ontop = OntopProcessor.sqlite
 
   val mappings = List(
-    //    R2RMLComuniSQLite.citta_metropolitane,
-    R2RMLComuniSQLite.regioni
-  //    R2RMLComuniSQLite.province,
-  //    R2RMLComuniSQLite.comuni
-  )
+    R2RMLComuniSQLite.citta_metropolitane,
+    R2RMLComuniSQLite.regioni,
+    R2RMLComuniSQLite.province,
+    R2RMLComuniSQLite.comuni)
 
   val r2rml_model = ontop.loadTurtle(mappings.mkString("\n"))
 

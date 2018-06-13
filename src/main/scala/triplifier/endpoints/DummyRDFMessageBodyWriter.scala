@@ -1,29 +1,50 @@
 package triplifier.endpoints
 
 import javax.ws.rs.ext.MessageBodyWriter
+import java.lang.annotation.Annotation
 import org.openrdf.model.Model
+import java.lang.reflect.Type
+import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.MultivaluedMap
+import java.io.OutputStream
+import org.openrdf.rio.Rio
+import org.openrdf.rio.WriterConfig
+import org.openrdf.rio.RDFFormat
 
+/*
+ * CHECK: we could customize the response using an ad-hoc MessageBodyWriter for RDF models
+ *
+ * this is a naive ide for serializing an in-memory model
+ */
 class DummyRDFMessageBodyWriter extends MessageBodyWriter[Model] {
 
   def getSize(
-    model: Model,
-    x$2:   Class[_],
-    x$3:   java.lang.reflect.Type,
-    x$4:   Array[java.lang.annotation.Annotation],
-    x$5:   javax.ws.rs.core.MediaType): Long = model.size()
+    model:       Model,
+    klass:       Class[_],
+    java_type:   Type,
+    annotations: Array[Annotation],
+    media_type:  MediaType): Long = model.size()
 
   def isWriteable(
-    x$1: Class[_],
-    x$2: java.lang.reflect.Type,
-    x$3: Array[java.lang.annotation.Annotation], x$4: javax.ws.rs.core.MediaType): Boolean = false
+    klass:       Class[_],
+    java_type:   Type,
+    annotations: Array[Annotation],
+    media_type:         MediaType): Boolean = false
 
   def writeTo(
-    model: org.openrdf.model.Model,
-    x$2:   Class[_], x$3: java.lang.reflect.Type,
-    x$4: Array[java.lang.annotation.Annotation],
-    x$5: javax.ws.rs.core.MediaType,
-    x$6: javax.ws.rs.core.MultivaluedMap[String, Object],
-    x$7: java.io.OutputStream) {
+    model:       Model,
+    klass:       Class[_],
+    java_type:   Type,
+    annotations: Array[Annotation],
+    media_type:  MediaType,
+    multi_map:   MultivaluedMap[String, Object],
+    out:         OutputStream) {
+
+    val _media = media_type.getType // CHECK: we should extend the available MIME types here
+
+    val _settings = new WriterConfig
+
+    Rio.write(model, out, RDFFormat.NTRIPLES, _settings)
 
   }
 

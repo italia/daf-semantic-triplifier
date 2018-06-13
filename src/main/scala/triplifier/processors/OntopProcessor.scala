@@ -37,6 +37,8 @@ import org.eclipse.rdf4j.model.ModelFactory
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import scala.util.Success
+import scala.util.Failure
 
 object OntopProcessor {
 
@@ -152,16 +154,22 @@ class OntopProcessor(config: Config) extends RDFProcessor {
 
     val start_time = LocalDateTime.now()
 
-    val r2rmlModel = loadTurtle(r2rml, baseURI)
+    val r2rmlModel = loadTurtle(r2rml, baseURI).get
+
+    //    match {
+    //      case Success(ok) => ok
+    //      case Failure(no) =>
+    //        throw new RuntimeException("cannot parse R2RML!")
+    //    }
 
     // CHECK namespaces: val namespaces = r2rmlModel.getNamespaces
 
-    val triplesMaps = this.triplesMaps(r2rmlModel.get).get
+    val triplesMaps = this.triplesMaps(r2rmlModel).get
 
     logger.info("\nRDF mapping, using TripleMap definitions:")
     logger.info(triplesMaps.mkString("\n"))
 
-    val repo = new SesameVirtualRepo(repo_name, owlOntology, r2rmlModel.get, preferences)
+    val repo = new SesameVirtualRepo(repo_name, owlOntology, r2rmlModel, preferences)
     // IDEA: notification sail instead of Iterations of statements
 
     if (!repo.isInitialized()) repo.initialize()
@@ -202,19 +210,20 @@ class OntopProcessor(config: Config) extends RDFProcessor {
 
     val statements = r2rml_list
       .par // CHECK if works
-      .flatMap { r2rml => process(r2rml).getOrElse(List()) }
+      .flatMap { r2rml => process(r2rml).get }
       .toStream
       .sortWith {
         (st1, st2) =>
           val test1 = s"${st1.getContext}${st1.getSubject}${st1.getPredicate}"
           val test2 = s"${st2.getContext}${st2.getSubject}${st2.getPredicate}"
           test1.compareTo(test2) < 0
-      }.distinct // NOTE: distinct is needed due to a bug in this version of ontop!
+      }
+      .distinct // NOTE: distinct is needed due to a bug in this version of ontop!
 
     // CHECK val settings = new WriterConfig for formatting, pretty-print etc
 
     // TODO: pretty print
-    Rio.write((metadata_statements ++ statements), out, rdf_format)
+    Rio.write((metadata_statements ++ statements).asJava, out, rdf_format)
 
   }
 
