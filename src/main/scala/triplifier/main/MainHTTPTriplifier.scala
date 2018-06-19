@@ -17,7 +17,7 @@ object MainHTTPTriplifier extends App {
   PropertyConfigurator.configure("./conf/log4j.properties")
 
   val conf = ConfigFactory
-    .parseFile(Paths.get("./conf/application.conf").toAbsolutePath().normalize().toFile())
+    .parseFile(Paths.get("./conf/triplifier.conf").toAbsolutePath().normalize().toFile())
     .resolve()
 
   val http = HTTP(conf)

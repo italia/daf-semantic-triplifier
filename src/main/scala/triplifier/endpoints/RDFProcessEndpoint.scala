@@ -87,7 +87,8 @@ class RDFProcessEndpoint {
     @PathParam("ext")@DefaultValue("ttl") ext:                             String,
     @Context req:                                                          Request) = {
 
-    val fs = new FileDataSource(s"${user}/${group}/${dataset}")
+    // TODO: configuration
+    val fs = new FileDataSource("./data", s"${user}/${group}/${dataset}")
     fs.getDump(ext)
 
     // TODO: a better error handling
@@ -113,10 +114,7 @@ class RDFProcessEndpoint {
 
 }
 
-class FileDataSource(path: String) {
-
-  // TODO: configuration
-  val base_path = "./data" // TODO: configure RDF storage
+class FileDataSource(base_path: String, path: String) {
 
   val dataset_dir = Paths.get(base_path, s"${path}").toAbsolutePath().normalize()
 
@@ -139,6 +137,7 @@ class FileDataSource(path: String) {
     val content = baos.toString()
     baos.close()
     content
+
   }
 
 }
