@@ -1,0 +1,106 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+
+@base  <https://w3id.org/italia/> .
+
+# regioni 
+
+<VIEW_regioni> rr:sqlQuery """
+
+SELECT 
+	codice_regione AS _CODICE_REGIONE 
+	,denominazione_regione AS _NOME_REGIONE 
+	,codice_nuts2_2006 AS _NUTS2  
+FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' 
+
+"""
+.
+
+
+<TriplesMap_DatasetConceptScheme> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_regioni> ;
+
+rr:subjectMap [ 
+	rr:constant <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions> ;
+	rr:class skos:ConceptScheme ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate skos:hasTopConcept ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.
+
+
+<TriplesMap_CodiceRegione> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_regioni> ;
+
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/cr-{'_CODICE_REGIONE'}" ;
+	rr:class clvapit:Identifier ;
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate l0:identifier ; 
+	rr:objectMap [ rr:column "_CODICE_REGIONE" ; ]
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:identifierType ; 
+	rr:objectMap [ rr:constant "Codice Regione" ; ]
+] ;
+
+.
+
+<TriplesMap_Region> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_regioni> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
+	rr:class clvapit:Feature, clvapit:Region, clvapit:AddressComponent, clvapit:NamedAddressComponent , skos:Concept ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate l0:name ; 
+	rr:objectMap [ rr:column "_NOME_REGIONE" ; rr:language "it" ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:hasRank ; 
+	rr:objectMap [ rr:constant 2 ; rr:datatype xsd:integer ] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:hasIdentifier ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/cr-{'_CODICE_REGIONE'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate owl:sameAs ; 
+	rr:objectMap [ 
+		rr:template "http://nuts.geovocab.org/id/{'_NUTS2'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.

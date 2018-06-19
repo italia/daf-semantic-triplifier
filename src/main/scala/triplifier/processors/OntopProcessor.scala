@@ -206,9 +206,11 @@ class OntopProcessor(config: Config) extends RDFProcessor {
    */
   def dump(r2rml_list: Seq[String])(metadata: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
 
+    // CHECK val settings = new WriterConfig for formatting, pretty-print etc
+
     val metadata_statements: Seq[Statement] = loadTurtle(metadata.getOrElse(""), guessBaseURI).get.toStream
 
-    val statements = r2rml_list
+    val dump_statements = r2rml_list
       .par // CHECK if works
       .flatMap { r2rml => process(r2rml).get }
       .toStream
@@ -220,10 +222,10 @@ class OntopProcessor(config: Config) extends RDFProcessor {
       }
       .distinct // NOTE: distinct is needed due to a bug in this version of ontop!
 
-    // CHECK val settings = new WriterConfig for formatting, pretty-print etc
+    val statements = (metadata_statements ++ dump_statements)
 
     // TODO: pretty print
-    Rio.write((metadata_statements ++ statements).asJava, out, rdf_format)
+    Rio.write(statements, out, rdf_format)
 
   }
 
