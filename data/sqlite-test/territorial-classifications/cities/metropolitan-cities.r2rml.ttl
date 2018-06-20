@@ -1,5 +1,7 @@
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
 @prefix l0: <https://w3id.org/italia/onto/l0/> .
 @prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
 @prefix nuts: <http://nuts.geovocab.org/id/> .

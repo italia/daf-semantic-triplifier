@@ -22,7 +22,7 @@ SELECT
 	,sigla_automobilistica AS _SIGLA_AUTOMOBILISTICA
 	,codice_nuts2_2006 AS _NUTS2
 	,codice_nuts3_2006 AS _NUTS3 
-FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani'
+FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani
 WHERE (_NOME_PROVINCIA != '-' AND _NOME_CITTA_METROPOLITANA = '-')  
 
 """
