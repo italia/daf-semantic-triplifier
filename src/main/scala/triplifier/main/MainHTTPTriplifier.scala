@@ -5,6 +5,12 @@ import com.typesafe.config.ConfigFactory
 import org.apache.log4j.PropertyConfigurator
 import java.nio.file.Paths
 import it.almawave.kb.http.HTTP
+import it.almawave.kb.http.utils.JSON
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import com.typesafe.config.ConfigRenderOptions
+import com.typesafe.config.Config
 
 /**
  * this is just used for starting the embedded server

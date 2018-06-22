@@ -113,7 +113,7 @@ class StatelessEndpoint {
       Response
         .ok()
         .entity(stream)
-        .`type`(MediaType.TEXT_PLAIN) // CHECK: bodywriter per RDF...
+        .`type`(MediaType.TEXT_PLAIN + "; charset=UTF-8") // CHECK: bodywriter per RDF...
         .encoding("UTF-8")
         .lastModified(new Date())
         .header("debug.configuration", _config.toString())
