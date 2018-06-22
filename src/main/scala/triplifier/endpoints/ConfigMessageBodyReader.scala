@@ -10,7 +10,11 @@ import java.io.InputStream
 import scala.io.Source
 import com.typesafe.config.ConfigFactory
 
-// CHECK this example. This could be useful to handle the responses in a different way.
+/*
+ * CHECK this example. 
+ * This could be useful to handle the responses in a different way.
+ * The idea is to have a component able to handle Config/Hocon response, directly.
+ */
 class ConfigMessageBodyReader extends MessageBodyReader[Config] {
 
   override def isReadable(

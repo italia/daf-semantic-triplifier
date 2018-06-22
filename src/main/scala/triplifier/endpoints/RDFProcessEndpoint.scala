@@ -66,6 +66,8 @@ import java.nio.file.Files
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import javax.ws.rs.Encoded
+import javax.inject.Inject
+import it.almawave.kb.http.providers.ConfigurationService
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -73,25 +75,38 @@ class RDFProcessEndpoint {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  @Context
-  var uriInfo: UriInfo = null
+  @Inject var _configuration: ConfigurationService = null
+
+  // TODO: add content-negotiation for handling an HTML representation of the data
 
   @GET
-  @Path("/datasets/{user}/{group}/{dataset: .+?}.{ext}")
+  @Path("/datasets/{user}/{dataset: .+?}.{ext}")
   @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
   def createRDFByMapping(
-    @PathParam("user")@DefaultValue("opendata") user:                      String,
-    @PathParam("group")@DefaultValue("territorial-classifications") group: String,
-    @PathParam("dataset")@DefaultValue("regions") dataset:                 String,
-    @PathParam("ext")@DefaultValue("ttl") ext:                             String,
-    @Context req:                                                          Request) = {
+    @PathParam("user")@DefaultValue("opendata") user:      String,
+    @PathParam("dataset")@DefaultValue("regions") dataset: String,
+    @PathParam("ext")@DefaultValue("ttl") ext:             String,
+    @Context req:                                          Request) = {
 
     // TODO: configuration
-    val fs = new FileDataSource("./data", s"${user}/${group}/${dataset}")
-    fs.getDump(ext)
+    val fs = new DatasetHelper("./data", s"${user}/${dataset}")
+    val dump = fs.createRDFDump(ext)
 
     // TODO: a better error handling
+    // TODO: process by stream
+
+    // TODO: see how to handle default configs...
+    val conf = _configuration.conf
+    println("TEST CONF 02>\n" + _configuration.json)
+
+    Response
+      .ok()
+      .entity(dump)
+      .`type`(MediaType.TEXT_PLAIN + "; charset=UTF-8") // CHECK: bodywriter per RDF...
+      .encoding("UTF-8")
+      .lastModified(new Date())
+      .build()
 
   }
 
@@ -113,33 +128,3 @@ class RDFProcessEndpoint {
   }
 
 }
-
-class FileDataSource(base_path: String, path: String) {
-
-  val dataset_dir = Paths.get(base_path, s"${path}").toAbsolutePath().normalize()
-
-  val config_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".conf") }.head
-  val config = Files.readAllLines(config_path).mkString("\n")
-
-  val meta_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".metadata.ttl") }.head
-  val meta = Files.readAllLines(meta_path).mkString("\n")
-
-  val r2rml_paths = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".r2rml.ttl") }.toList
-  val r2rmls = r2rml_paths.map { r2rml_path => Files.readAllLines(r2rml_path).mkString("\n") }.toList
-
-  val ontop = OntopProcessor.parse(config)
-
-  def getDump(ext: String) = {
-
-    val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
-    val baos = new ByteArrayOutputStream
-    ontop.dump(r2rmls)(Option(meta))(baos, rdf_format)
-    val content = baos.toString()
-    baos.close()
-    content
-
-  }
-
-}
-
-
