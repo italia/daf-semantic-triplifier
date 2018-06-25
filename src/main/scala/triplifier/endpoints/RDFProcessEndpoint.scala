@@ -68,6 +68,7 @@ import scala.collection.JavaConverters._
 import javax.ws.rs.Encoded
 import javax.inject.Inject
 import it.almawave.kb.http.providers.ConfigurationService
+import io.swagger.annotations.ExternalDocs
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -77,28 +78,29 @@ class RDFProcessEndpoint {
 
   @Inject var _configuration: ConfigurationService = null
 
-  // TODO: add content-negotiation for handling an HTML representation of the data
-
+  /*
+   * TODO: add content-negotiation for handling an HTML representation of the data
+   * TODO: a better error handling
+   * TODO: process by stream
+   */
   @GET
   @Path("/datasets/{user}/{dataset: .+?}.{ext}")
   @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
+  @ExternalDocs(
+    value = "endpoint for local testing",
+    url = "/kb/api/v1/triplify/datasets/sqlite-test/territorial-classifications/regions.ttl")
   def createRDFByMapping(
-    @PathParam("user")@DefaultValue("opendata") user:      String,
-    @PathParam("dataset")@DefaultValue("regions") dataset: String,
-    @PathParam("ext")@DefaultValue("ttl") ext:             String,
-    @Context req:                                          Request) = {
+    @PathParam("user")@DefaultValue("sqlite-test") user:                                   String,
+    @PathParam("dataset")@DefaultValue("territorial-classifications/regions.ttl") dataset: String,
+    @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
+    @Context req:                                                                          Request) = {
 
-    // TODO: configuration
-    val fs = new DatasetHelper("./data", s"${user}/${dataset}")
-    val dump = fs.createRDFDump(ext)
-
-    // TODO: a better error handling
-    // TODO: process by stream
-
-    // TODO: see how to handle default configs...
+    // loading default, general configuration
     val conf = _configuration.conf
-    println("TEST CONF 02>\n" + _configuration.json)
+
+    val fs = new DatasetHelper(conf, s"${user}/${dataset}")
+    val dump = fs.createRDFDumpAsString(ext)
 
     Response
       .ok()
