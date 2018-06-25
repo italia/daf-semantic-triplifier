@@ -59,6 +59,7 @@ import scala.concurrent.duration.Duration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import it.almawave.kb.http.utils.AsyncHelper._
+import io.swagger.annotations.ExternalDocs
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -73,6 +74,9 @@ class StatelessEndpoint {
   @Path("/stateless/process")
   @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
+  @ExternalDocs(
+    value = "\t\tRDF process form\n",
+    url = "/static/rdf-process.html")
   def createRDFByMapping(
     @FormParam("config") config:     String,
     @FormParam("r2rml") r2rml:       String,
