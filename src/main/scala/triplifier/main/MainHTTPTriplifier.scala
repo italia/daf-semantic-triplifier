@@ -38,5 +38,4 @@ object MainHTTPTriplifier extends App {
 // http://localhost:7777/kb/api/v1/swagger.json
 // http://localhost:7777/kb/api/v1/application.wadl
 // http://localhost:7777/static/rdf-process.html
-// http://localhost:7777/static/rdf-process.html
 // http://localhost:7777/static/r2rml-guess.html

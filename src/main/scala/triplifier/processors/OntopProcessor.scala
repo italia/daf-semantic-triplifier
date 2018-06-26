@@ -200,21 +200,24 @@ class OntopProcessor(config: Config) extends RDFProcessor {
    * This method is useful to create a dump of the data, on a choosen outputstream,
    * which can be a file, a response writer, and so on.
    *
-   * TODO:
-   * 	+ dump to file
-   *  + Future handling
+   * TODO: define a decorator for writing on string
    */
   def dump(r2rml_list: Seq[String])(metadata: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
 
     // CHECK val settings = new WriterConfig for formatting, pretty-print etc
 
-    val metadata_statements: Seq[Statement] = loadTurtle(metadata.getOrElse(""), guessBaseURI).get.toStream
+    val metadata_statements: Seq[Statement] = loadTurtle(
+      metadata.getOrElse(""),
+      guessBaseURI)
+      .getOrElse(new LinkedHashModel) // workaround for missing metadata
+      .toStream
 
     val dump_statements = r2rml_list
       .par // CHECK if works
       .flatMap { r2rml => process(r2rml).get }
       .toStream
       .sortWith {
+        // this is an hack for improving readability of serialized output, for example for turtles
         (st1, st2) =>
           val test1 = s"${st1.getContext}${st1.getSubject}${st1.getPredicate}"
           val test2 = s"${st2.getContext}${st2.getSubject}${st2.getPredicate}"
@@ -222,9 +225,10 @@ class OntopProcessor(config: Config) extends RDFProcessor {
       }
       .distinct // NOTE: distinct is needed due to a bug in this version of ontop!
 
+    // CHECK: avoid saving head of streams here!
     val statements = (metadata_statements ++ dump_statements)
 
-    // TODO: pretty print
+    // TODO: improve pretty print
     Rio.write(statements, out, rdf_format)
 
   }

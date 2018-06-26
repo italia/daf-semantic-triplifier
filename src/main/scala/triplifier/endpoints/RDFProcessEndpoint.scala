@@ -112,7 +112,6 @@ class RDFProcessEndpoint {
 
   }
 
-  // REVIEW
   def getFormat(mime: String) = {
 
     val format = URLDecoder.decode(mime, "UTF-8")

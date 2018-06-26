@@ -5,7 +5,7 @@
 <title>testing R2RML</title>
 <style type="text/css">
 h1 {
-	font: small-caps 1.4em Arial !important ;
+	font: small-caps 1.4em Arial !important;
 }
 </style>
 </head>
@@ -15,17 +15,17 @@ h1 {
 
 		<h1>RDF creation with R2RML</h1>
 
-		<hr/>
+		<hr />
 
 		<form role="form" class="form-area"
-			action="/kb/api/v1/triplify/stateless/process"
-			method="post">
-			
+			action="/kb/api/v1/triplify/stateless/process" method="post">
 
-			
+
+
 			<fieldset>
 				<label for="config">config</label>
-				<textarea class="form-control" rows="8" cols="120" name="config" placeholder="configuration" required>
+				<textarea class="form-control" rows="8" cols="120" name="config"
+					placeholder="configuration" required>
 jdbc {
 	driver = "org.sqlite.JDBC"
 	dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
@@ -39,29 +39,42 @@ parameters {
 				</textarea>
 
 				<label for="r2rml">R2RML</label>
-				<textarea id="r2rml" class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping"></textarea>
+				<textarea id="r2rml" class="form-control" rows="8" cols="120" name="r2rml" placeholder="R2RML mapping">#</textarea>
 
-				<label for="name">name</label>
-				<input type="text" name="name" value="dump" /> 
-				
-				<label for="format">format</label>
+			</fieldset>
+
+			<fieldset id="metadata">
+				<label for="metadata">DCAT-AP_IT metadata</label>
+				<textarea id="metadata" class="form-control" rows="4" cols="120" name="metadata" placeholder="DCAT-AP_IT metadata">#</textarea>
+			</fieldset>
+			
+			<fieldset id="rdf_extra">
+				<label for="rdf_manual">RDF data</label>
+				<textarea id="rdf_manual" class="form-control" rows="4" cols="120" name="metadata" placeholder="RDF_extra">#</textarea>
+			</fieldset>
+
+			<fieldset id="rdf_dump">
+				<label for="name">name</label> 
+				<input type="text" name="name" value="rdf_dump" /> 
+					
+				<label for="format">format</label> 
 				<select name="format">
 					<option selected="selected" value="text/turtle">ttl</option>
 					<option value="text/plain; ext=nt">nt</option>
-				</select>
+				</select> 
+				
+				<label for="context">context</label>
+				<input name="url" type="text" value="test://context" />
+				<label for="publish">publish</label>
+				<input name="publish" type="checkbox" value="false" />
 				
 				<input class="pull-right btn btn-default" type="submit" value="create RDF" />
-
-			</fieldset>
-
-			<fieldset>
-				<label for="metadata">DCAT-AP_IT metadata</label>
-				<textarea id="metadata" class="form-control" rows="4" cols="120" name="metadata" placeholder="DCAT-AP_IT metadata"></textarea>
 			</fieldset>
 			
+
 		</form>
-		
-		<br/><br/>
+
+		<br /> <br />
 
 	</div>
 
@@ -92,9 +105,18 @@ parameters {
 		rel="stylesheet" type="text/css" />
 	<script src="https://perfectkb.github.io/yate/dist/yate.bundled.min.js"></script>
 	<script src="https://perfectkb.github.io/yate/doc/doc.min.js"></script>
+
 	<script type="text/javascript">
-		var yate_r2rml = YATE.fromTextArea(document.getElementById('r2rml'))
-		// RIVEDERE: var yate_dcat = YATE.fromTextArea(document.getElementById('metadata'))
+		$(function() {
+			
+			var yate_r2rml = YATE.fromTextArea(document.getElementById('r2rml'), {})
+			console.log("R2RML", yate_r2rml)
+			
+// 			var yate_dcat = YATE.fromTextArea(document.getElementById('metadata'), {})
+// 			console.log("METADATA", yate_dcat)
+			
+		})
+				
 	</script>
 
 

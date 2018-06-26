@@ -60,6 +60,8 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import it.almawave.kb.http.utils.AsyncHelper._
 import io.swagger.annotations.ExternalDocs
+import javax.inject.Inject
+import it.almawave.kb.http.providers.ConfigurationService
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -67,8 +69,10 @@ class StatelessEndpoint {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  @Context
-  var uriInfo: UriInfo = null
+  //  @Context
+  //  var uriInfo: UriInfo = null
+
+  @Inject var _configuration: ConfigurationService = null
 
   @POST
   @Path("/stateless/process")
@@ -78,7 +82,7 @@ class StatelessEndpoint {
     value = "\t\tRDF process form\n",
     url = "/static/rdf-process.html")
   def createRDFByMapping(
-    @FormParam("config") config:     String,
+    @FormParam("config") configTxt:  String,
     @FormParam("r2rml") r2rml:       String,
     @FormParam("metadata") metadata: String,
     @FormParam("name") fileName:     String,
@@ -87,7 +91,10 @@ class StatelessEndpoint {
 
     Future {
 
-      val _config = URLDecoder.decode(config, "UTF-8")
+      val _config = URLDecoder.decode(configTxt, "UTF-8")
+      val config = ConfigFactory.parseString(_config)
+        .withFallback(_configuration.conf)
+        .resolve()
 
       logger.debug(s"\n\nusing configuration:\n${_config}")
 
@@ -98,25 +105,15 @@ class StatelessEndpoint {
       logger.debug("requested format: " + rdf_format + "\n\n")
       logger.debug(s"R2RML mapping: ${r2rml}")
 
-      val ontop = OntopProcessor.parse(config)
+      val ontop = OntopProcessor(config)
 
-      val stream = new StreamingOutput {
-        def write(out: OutputStream) {
-          try {
-            ontop.dump(List(r2rml))(meta_opt)(out, rdf_format)
-          } catch {
-            case err: Throwable =>
-              logger.error(err.getStackTrace.mkString("\n"))
-          }
-          out.flush()
-          out.close()
-        }
-      }
-      // TODO: add a JUnit test for this part!
+      val baos = new ByteArrayOutputStream
+      ontop.dump(List(r2rml))(meta_opt)(baos, rdf_format)
+      val dump = baos.toString("UTF-8")
 
       Response
         .ok()
-        .entity(stream)
+        .entity(dump)
         .`type`(MediaType.TEXT_PLAIN + "; charset=UTF-8") // CHECK: bodywriter per RDF...
         .encoding("UTF-8")
         .lastModified(new Date())
@@ -145,4 +142,17 @@ class StatelessEndpoint {
     content
   }
 
+  //      REVIEW
+  //      val dump = new StreamingOutput {
+  //        def write(out: OutputStream) {
+  //          try {
+  //            ontop.dump(List(r2rml))(meta_opt)(out, rdf_format)
+  //          } catch {
+  //            case err: Throwable =>
+  //              logger.error(err.getStackTrace.mkString("\n"))
+  //          }
+  //          out.flush()
+  //          out.close()
+  //        }
+  //      }
 }
