@@ -16,6 +16,7 @@ import com.typesafe.config.Config
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import triplifier.processors.RDFProcessor
+import java.io.OutputStream
 
 /*
  *  TODO: review of DatasetHelper logic, refactorization
@@ -36,13 +37,12 @@ class DatasetHelper(default_configuration: Config, path: String) {
 
   val config = this.getDatasetConfig()
 
-  //  println(".......................................")
-  //  println(default_configuration.root().unwrapped())
-  //  println(".......................................")
-  //  println(config.root().unwrapped())
-  //  println(".......................................")
-
   val rdf_processor: RDFProcessor = OntopProcessor(config)
+
+  def writeRDFDump(ext: String, out: OutputStream) {
+    val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
+    rdf_processor.dump(r2rmls)(Option(meta))(out, rdf_format)
+  }
 
   def createRDFDumpAsString(ext: String): String = {
 
