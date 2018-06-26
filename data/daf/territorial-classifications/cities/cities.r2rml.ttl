@@ -10,40 +10,42 @@
 
 # comuni
 
-<VIEW_comuni_draft> rr:sqlQuery """
-
-SELECT DISTINCT
-	ISTAT.denominazione_corrente AS _NOME   
-	,ANPR.stato AS _STATO 
-	,ANPR.codcatastale AS _CODICE_CATASTALE 
-	,ISTAT.codice_provincia AS _CODICE_PROVINCIA 
-	,ISTAT.codice_comune_formato_numerico AS _CODICE_ISTAT
-	,dataistituzione AS _DATA_ISTITUZIONE
-	,datacessazione AS _DATA_CESSAZIONE
-	,dataultimoagg AS _DATA_AGGIORNAMENTO 
-FROM 'gove__amministrazione.default_org_o_anpr_archivio_storico_comuni' AS ANPR 
-JOIN 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' AS ISTAT 
-ON (ISTAT.codice_comune_formato_numerico=ANPR.codistat)
-ORDER BY _NOME 
-
-"""
-.
-
 <VIEW_comuni> rr:sqlQuery """
 
-SELECT DISTINCT * 
-FROM 'TEST_COMUNI' 
+
+-- VIEW comuni
+
+SELECT DISTINCT
+ISTAT.denominazione_corrente AS _NOME 
+,SUBSTR(datacessazione, 7, 4) AS TEST 
+,progressivo_del_comune AS _CODICE_PROGRESSIVO 
+,ANPR.stato AS _STATO 
+,ANPR.codcatastale AS _CODICE_CATASTALE 
+,ISTAT.codice_provincia AS _CODICE_PROVINCIA 
+,ISTAT.codice_comune_formato_numerico AS _CODICE_ISTAT   
+,dataistituzione 
+--,TO_DATE(CONCAT(SUBSTR(dataistituzione, 7, 4),'-',SUBSTR(dataistituzione, 4,2),'-',SUBSTR(dataistituzione, 1,2))) AS _DATA_ISTITUZIONE
+--,TO_DATE(CONCAT(SUBSTR(datacessazione, 7, 4),'-',SUBSTR(datacessazione, 4,2),'-',SUBSTR(datacessazione, 1,2))) AS _DATA_CESSAZIONE
+--,TO_DATE(CONCAT(SUBSTR(dataultimoagg, 7, 4),'-',SUBSTR(dataultimoagg, 4,2),'-',SUBSTR(dataultimoagg, 1,2))) AS _DATA_AGGIORNAMENTO
+,dataistituzione AS _DATA_ISTITUZIONE
+,datacessazione AS _DATA_CESSAZIONE
+,dataultimoagg AS _DATA_AGGIORNAMENTO
+FROM `gove__amministrazione`.`default_org_o_anpr_archivio_storico_comuni` AS ANPR 
+JOIN `gove__amministrazione`.`default_org_o_istat_elenco_comuni_italiani` AS ISTAT 
+ON (ISTAT.codice_comune_formato_numerico=ANPR.codistat)
 ORDER BY _CODICE_PROGRESSIVO 
+
 
 """
 .
+
 
 # TODO: add UDF for time / date
 
 
 <TriplesMap_DatasetConceptScheme> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; 
+rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
 	rr:constant <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities> ;
@@ -62,7 +64,7 @@ rr:predicateObjectMap [
 
 <TriplesMap_Vocabulary> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; 
+rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
 	rr:constant <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities> ;
@@ -80,7 +82,7 @@ rr:predicateObjectMap [
 
 <TriplesMap_TimeInterval> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; 
+rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
@@ -99,7 +101,7 @@ rr:predicateObjectMap [
 
 <TriplesMap_CodiceISTAT> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; 
+rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-istat/{'_CODICE_ISTAT'}" ;
@@ -118,7 +120,7 @@ rr:predicateObjectMap [
 
 <TriplesMap_CodiceProgressivoComune> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ];
+rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/progressivo-comune/{'_CODICE_PROGRESSIVO'}" ;
@@ -137,7 +139,7 @@ rr:predicateObjectMap [
 
 <TriplesMap_CodiceCatastale> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ];
+rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-catastale/{'_CODICE_CATASTALE'}" ;
@@ -156,7 +158,7 @@ rr:predicateObjectMap [
 
 <TriplesMap_Comuni> a rr:TriplesMapClass ;
 
-rr:logicalTable [ rr:tableName "TEST_COMUNI" ]; # HACK locale per le date
+rr:logicalTable <VIEW_comuni> ;
 	
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_CODICE_ISTAT'}-({'_DATA_ISTITUZIONE'})" ;

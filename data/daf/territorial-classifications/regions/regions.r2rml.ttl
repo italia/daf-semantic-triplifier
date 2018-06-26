@@ -15,7 +15,7 @@ SELECT
 	codice_regione AS _CODICE_REGIONE 
 	,denominazione_regione AS _NOME_REGIONE 
 	,codice_nuts2_2006 AS _NUTS2  
-FROM 'gove__amministrazione.default_org_o_istat_elenco_comuni_italiani' 
+FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani
 
 """
 .
