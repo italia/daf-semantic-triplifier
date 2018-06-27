@@ -60,6 +60,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import it.almawave.kb.http.utils.AsyncHelper._
 import io.swagger.annotations.ExternalDocs
+
 import javax.inject.Inject
 import it.almawave.kb.http.providers.ConfigurationService
 
@@ -68,9 +69,6 @@ import it.almawave.kb.http.providers.ConfigurationService
 class StatelessEndpoint {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
-
-  //  @Context
-  //  var uriInfo: UriInfo = null
 
   @Inject var _configuration: ConfigurationService = null
 
@@ -156,4 +154,5 @@ class StatelessEndpoint {
   //          out.close()
   //        }
   //      }
+
 }

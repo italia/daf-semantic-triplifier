@@ -40,7 +40,6 @@ rr:predicateObjectMap [
 
 .
 
-
 <TriplesMap_CodiceRegione> a rr:TriplesMapClass ;
 
 rr:logicalTable <VIEW_regioni> ;
