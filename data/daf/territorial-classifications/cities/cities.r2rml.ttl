@@ -39,6 +39,14 @@ ORDER BY _CODICE_PROGRESSIVO
 """
 .
 
+<VIEW_comuni> rr:sqlQuery """
+
+SELECT DISTINCT * 
+FROM 'TEST_COMUNI' 
+ORDER BY _CODICE_PROGRESSIVO 
+
+"""
+.
 
 # TODO: add UDF for time / date
 
@@ -46,6 +54,7 @@ ORDER BY _CODICE_PROGRESSIVO
 <TriplesMap_DatasetConceptScheme> a rr:TriplesMapClass ;
 
 rr:logicalTable <VIEW_comuni> ;
+
 
 rr:subjectMap [ 
 	rr:constant <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities> ;
