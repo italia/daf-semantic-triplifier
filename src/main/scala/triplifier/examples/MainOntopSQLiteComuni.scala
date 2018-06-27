@@ -24,7 +24,7 @@ object MainOntopSQLiteComuni extends App {
   val r2rml_model = ontop.loadTurtle(mappings.mkString("\n"))
 
   val fos = new FileOutputStream(dump_file)
-  ontop.dump(mappings)(None)(fos, RDFFormat.TURTLE)
+  ontop.dump(mappings)(None)(None)(fos, RDFFormat.TURTLE)
   fos.flush()
   fos.close()
 

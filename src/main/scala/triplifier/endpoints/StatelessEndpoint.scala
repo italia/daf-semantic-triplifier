@@ -85,6 +85,7 @@ class StatelessEndpoint {
     @FormParam("config") configTxt:  String,
     @FormParam("r2rml") r2rml:       String,
     @FormParam("metadata") metadata: String,
+    @FormParam("rdf_data") rdf_data: String,
     @FormParam("name") fileName:     String,
     @FormParam("format") mime:       String,
     @Context req:                    Request) = {
@@ -108,7 +109,7 @@ class StatelessEndpoint {
       val ontop = OntopProcessor(config)
 
       val baos = new ByteArrayOutputStream
-      ontop.dump(List(r2rml))(meta_opt)(baos, rdf_format)
+      ontop.dump(List(r2rml))(meta_opt)(None)(baos, rdf_format)
       val dump = baos.toString("UTF-8")
 
       Response

@@ -41,14 +41,14 @@ class DatasetHelper(default_configuration: Config, path: String) {
 
   def writeRDFDump(ext: String, out: OutputStream) {
     val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
-    rdf_processor.dump(r2rmls)(Option(meta))(out, rdf_format)
+    rdf_processor.dump(r2rmls)(Option(meta))(None)(out, rdf_format)
   }
 
   def createRDFDumpAsString(ext: String): String = {
 
     val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
     val baos = new ByteArrayOutputStream
-    rdf_processor.dump(r2rmls)(Option(meta))(baos, rdf_format)
+    rdf_processor.dump(r2rmls)(Option(meta))(None)(baos, rdf_format)
     val content = baos.toString(ENCODING)
     baos.close()
     content

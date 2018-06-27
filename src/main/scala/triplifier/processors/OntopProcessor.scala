@@ -91,7 +91,7 @@ trait RDFProcessor {
 
   def process(r2rml: String): Try[Seq[Statement]]
 
-  def dump(r2rml_list: Seq[String])(metadata: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES)
+  def dump(r2rml_list: Seq[String])(metadata: Option[String])(rdf_data: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES)
 
   def previewDump(rdfFileName: String, offset: Int = -1, limit: Int = -1): String
 
@@ -202,7 +202,7 @@ class OntopProcessor(config: Config) extends RDFProcessor {
    *
    * TODO: define a decorator for writing on string
    */
-  def dump(r2rml_list: Seq[String])(metadata: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
+  def dump(r2rml_list: Seq[String])(metadata: Option[String])(rdf_data: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES) {
 
     // CHECK val settings = new WriterConfig for formatting, pretty-print etc
 
