@@ -26,12 +26,7 @@ h1 {
 				<label for="config">config</label>
 				<textarea class="form-control" rows="8" cols="120" name="config"
 					placeholder="configuration" required>
-jdbc {
-	driver = "org.sqlite.JDBC"
-	dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
-	user = "aserafini"
-	password = "openD4ti"
-}
+jdbc = ${jdbc.sqlite}
 parameters {
 	ontologies.base = "https://w3id.org/italia/onto"
 	vocabularies.base = "https://w3id.org/italia/controlled-vocabulary"
@@ -63,11 +58,21 @@ parameters {
 					<option value="text/plain; ext=nt">nt</option>
 				</select> 
 				
-				<label for="context">context</label>
-				<input name="url" type="text" value="test://context" />
-				<label for="publish">publish</label>
-				<input name="publish" type="checkbox" value="false" />
+				<!-- 
 				
+				<label for="context">context</label>
+				<input name="url" type="url" value="test://context" />
+				<label for="context_clean">clean</label>
+				<input name="context_clean" type="checkbox" checked="checked" />
+			
+				<label for="endpoint">endpoint</label>
+				<input name="endpoint" type="url" value="http://localhost:9999/sparql" />
+				<label for="publish">publish</label>
+				<input name="publish" type="checkbox" />
+				
+				-->
+				
+			
 				<input class="pull-right btn btn-default" type="submit" value="create RDF" />
 			</fieldset>
 			

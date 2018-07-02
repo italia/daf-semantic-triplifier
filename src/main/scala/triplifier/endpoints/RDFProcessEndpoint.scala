@@ -69,6 +69,7 @@ import javax.ws.rs.Encoded
 import javax.inject.Inject
 import it.almawave.kb.http.providers.ConfigurationService
 import io.swagger.annotations.ExternalDocs
+import java.nio.charset.Charset
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -89,9 +90,9 @@ class RDFProcessEndpoint {
   @Produces(Array(MediaType.TEXT_PLAIN))
   @ExternalDocs(
     value = "endpoint for local testing",
-    url = "/kb/api/v1/triplify/datasets/sqlite-test/territorial-classifications/regions.ttl")
+    url = "/kb/api/v1/triplify/datasets/test/territorial-classifications/regions.ttl")
   def createRDFByMapping(
-    @PathParam("user")@DefaultValue("sqlite-test") user:                                   String,
+    @PathParam("group")@DefaultValue("test") group:                                        String,
     @PathParam("dataset")@DefaultValue("territorial-classifications/regions.ttl") dataset: String,
     @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
     @Context req:                                                                          Request) = {
@@ -99,12 +100,15 @@ class RDFProcessEndpoint {
     // loading default, general configuration
     val conf = _configuration.conf
 
-    val fs = new DatasetHelper(conf, s"${user}/${dataset}")
-    val dump = fs.createRDFDumpAsString(ext)
+    val fs = new DatasetHelper(conf, s"${group}/${dataset}")
+
+    val dump_file = fs.saveRDFDump(ext)
+
+    val _preview = fs.previewAsLines(dump_file)
 
     Response
       .ok()
-      .entity(dump)
+      .entity(_preview.mkString("\n"))
       .`type`(MediaType.TEXT_PLAIN + "; charset=UTF-8") // CHECK: bodywriter per RDF...
       .encoding("UTF-8")
       .lastModified(new Date())

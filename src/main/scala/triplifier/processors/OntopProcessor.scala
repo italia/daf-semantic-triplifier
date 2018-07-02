@@ -89,10 +89,22 @@ trait RDFProcessor {
 
   def triplesMaps(r2rmlModel: Model): Try[Seq[String]]
 
+  /**
+   * This method executes an RDF process, using the given R2RML mapping,
+   * and outputs a sequence of Statement, wrapped in a Try object
+   */
   def process(r2rml: String): Try[Seq[Statement]]
 
+  /**
+   * The dump method is an extension of the process method, providing and explicit separation of
+   * various elements, and the serialization using an output stream.
+   */
   def dump(r2rml_list: Seq[String])(metadata: Option[String])(rdf_data: Option[String])(out: OutputStream, rdf_format: RDFFormat = RDFFormat.NTRIPLES)
 
+  /**
+   * the preview can be implemented in some different ways, but it's important to have it,
+   * in order to be abel to give feedback to the
+   */
   def previewDump(rdfFileName: String, offset: Int = -1, limit: Int = -1): String
 
 }
@@ -155,12 +167,6 @@ class OntopProcessor(config: Config) extends RDFProcessor {
     val start_time = LocalDateTime.now()
 
     val r2rmlModel = loadTurtle(r2rml, baseURI).get
-
-    //    match {
-    //      case Success(ok) => ok
-    //      case Failure(no) =>
-    //        throw new RuntimeException("cannot parse R2RML!")
-    //    }
 
     // CHECK namespaces: val namespaces = r2rmlModel.getNamespaces
 

@@ -1,0 +1,129 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+@prefix tiapit: <https://w3id.org/italia/onto/TI/> .
+
+@base  <https://w3id.org/italia/> .
+
+# comuni
+
+
+<VIEW_comuni> rr:sqlQuery """
+
+SELECT 
+ISTAT.denominazione_corrente AS _NOME 
+,TRIM(progressivo_del_comune) AS _CODICE_PROGRESSIVO 
+,ISTAT.codice_comune_formato_numerico AS _CODICE_ISTAT 
+,ANPR.codcatastale AS _CODICE_CATASTALE
+,ISTAT.codice_provincia AS _CODICE_PROVINCIA 
+,dataistituzione AS _DATA_ISTITUZIONE 
+,datacessazione AS _DATA_CESSAZIONE 
+,dataultimoagg AS _DATA_AGGIORNAMENTO 
+FROM gove__amministrazione.default_org_o_anpr_archivio_storico_comuni AS ANPR 
+RIGHT JOIN gove__amministrazione.default_org_o_istat_elenco_comuni_italiani AS ISTAT 
+ON (ISTAT.codice_comune_formato_numerico=ANPR.codistat)
+
+"""
+.
+
+
+<TriplesMap_DatasetConceptScheme> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_comuni> ;
+
+rr:subjectMap [ 
+	rr:constant <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities> ;
+	rr:class skos:ConceptScheme ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate skos:hasTopConcept ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_CODICE_ISTAT'}-({'_DATA_ISTITUZIONE'})" ; 
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.
+
+
+<TriplesMap_TimeInterval> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_comuni> ;
+
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
+	rr:class tiapit:TimeInterval ;
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate tiapit:startTime ; 
+	rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; ] # CHECK: rr:datatype xsd:date ;
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate tiapit:endTime ; 
+	rr:objectMap [ rr:column "_DATA_CESSAZIONE" ; ] # CHECK: rr:datatype xsd:date ;
+] ;
+
+.    
+
+<TriplesMap_CodiceISTAT> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_comuni> ;
+
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-istat/{'_CODICE_ISTAT'}" ;
+	rr:class clvapit:Identifier ;
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate l0:identifier ; 
+	rr:objectMap [ rr:column "_CODICE_ISTAT" ; ]
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:identifierType ; 
+	rr:objectMap [ rr:constant "Codice ISTAT" ; ]
+] ;
+
+.
+
+
+
+<TriplesMap_CodiceProgressivoComune> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_comuni> ;
+
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/progressivo-comune/{'_CODICE_PROGRESSIVO'}" ;
+	rr:class clvapit:Identifier ;
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate l0:identifier ; 
+	rr:objectMap [ rr:column "_CODICE_PROGRESSIVO" ; ]
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:identifierType ; 
+	rr:objectMap [ rr:constant "Progressivo del comune" ; ]
+] ;
+
+.
+
+<TriplesMap_CodiceCatastale> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_comuni> ;
+
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-catastale/{'_CODICE_CATASTALE'}" ;
+	rr:class clvapit:Identifier ;
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate l0:identifier ; 
+	rr:objectMap [ rr:column "_CODICE_CATASTALE" ; ]
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:identifierType ; 
+	rr:objectMap [ rr:constant "Codice Catastale" ; ]
+] ;
+
+.
