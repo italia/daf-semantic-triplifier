@@ -1,0 +1,38 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix roapit: <https://w3id.org/italia/onto/RO/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+
+@base  <https://w3id.org/italia/> .
+
+
+<VIEW_incarichi_AMM> rr:sqlQuery """
+
+SELECT DISTINCT 
+	LCASE(REGEXP_REPLACE(TRIM(AMM.titolo_resp), '\\s+', '-')) AS _RESP_TITOLO
+FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM 
+
+"""
+.
+
+<TriplesMap_IncarichiAmministrazioni> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_incarichi_AMM> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/data/role/{_RESP_TITOLO}" ;
+	rr:class roapit:Role ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate l0:name ; 
+	rr:objectMap [ rr:column "_RESP_TITOLO" ]
+] ;
+
+
+.
+

@@ -1,0 +1,68 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+
+@base  <https://w3id.org/italia/> .
+
+# regioni 
+
+<VIEW_amministrazioni> rr:sqlQuery """
+
+SELECT  
+cod_amm AS _CODICE_AMMINISTRAZIONE,  
+des_amm AS _DESCRIZIONE_AMMINISTRAZIONE, 
+tipologia_istat AS _TIPOLOGIA_ISTAT_DESCRIZIONE, 
+ABS(FNV_HASH(tipologia_istat)) AS _TIPOLOGIA_ISTAT_HASH,
+tipologia_amm AS _TIPOLOGIA_AMMINISTRAZIONE_DESCRIZIONE, 
+ABS(FNV_HASH(tipologia_amm)) AS _TIPOLOGIA_AMMINISTRAZIONE_HASH,
+cf AS _CODICE_FISCALE
+FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM 
+
+"""
+.
+
+
+# TODO: PublicOrganizationCategory
+
+<TriplesMap_Region> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_amministrazioni> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/data/organization/public-organization/support-unit/codice-amministrazione-{'_CODICE_AMMINISTRAZIONE'}" ;
+	rr:class covapit:PublicOrganization, skos:Concept ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate l0:description ; 
+	rr:objectMap [ rr:column "_DESCRIZIONE_AMMINISTRAZIONE" ; rr:language "it" ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:IPAcode ; 
+	rr:objectMap [ rr:column "_CODICE_AMMINISTRAZIONE" ; ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:_codice_fiscale ; 
+	rr:objectMap [ rr:column "_CODICE_FISCALE" ; ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:_titpologia_istat ; 
+	rr:objectMap [ rr:column "_TIPOLOGIA_ISTAT_HASH" ; ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:hasCategory ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organization/public-organization/tipologies/{_TIPOLOGIA_AMMINISTRAZIONE_HASH}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.
+

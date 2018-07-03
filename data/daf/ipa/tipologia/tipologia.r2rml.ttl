@@ -1,0 +1,40 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+
+@base  <https://w3id.org/italia/> .
+
+# regioni 
+
+<VIEW_tipologia_amministrazioni> rr:sqlQuery """
+
+SELECT DISTINCT 
+ABS(FNV_HASH(tipologia_amm)) AS _TIPOLOGIA_AMMINISTRAZIONE_HASH,
+tipologia_amm AS _TIPOLOGIA_AMMINISTRAZIONE_DESCRIZIONE
+FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM 
+
+"""
+.
+
+
+# TODO: PublicOrganizationCategory
+
+<TriplesMap_TipologiaAmministrazioni> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_tipologia_amministrazioni> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/data/organization/public-organization/tipologies/{_TIPOLOGIA_AMMINISTRAZIONE_HASH}" ;
+	rr:class covapit:PublicOrganizationCategory, skos:Concept ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate l0:description ; 
+	rr:objectMap [ rr:column "_TIPOLOGIA_AMMINISTRAZIONE_DESCRIZIONE" ; rr:language "it" ]
+] ;
+
+.
+
