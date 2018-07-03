@@ -104,11 +104,24 @@ class StatelessEndpoint {
       logger.debug("requested format: " + rdf_format + "\n\n")
       logger.debug(s"R2RML mapping: ${r2rml}")
 
-      val ontop = OntopProcessor(config)
+      //      val ontop = OntopProcessor(config)
+      //      val baos = new ByteArrayOutputStream
+      //      ontop.dump(List(r2rml))(meta_opt)(None)(baos, rdf_format)
+      //      val dump = baos.toString("UTF-8")
 
-      val baos = new ByteArrayOutputStream
-      ontop.dump(List(r2rml))(meta_opt)(None)(baos, rdf_format)
-      val dump = baos.toString("UTF-8")
+      val ontop = OntopProcessor(config)
+      val dump = new StreamingOutput {
+        def write(out: OutputStream) {
+          try {
+            ontop.dump(List(r2rml))(meta_opt)(None)(out, rdf_format)
+          } catch {
+            case err: Throwable =>
+              logger.error(err.getStackTrace.mkString("\n"))
+          }
+          out.flush()
+          out.close()
+        }
+      }
 
       Response
         .ok()
@@ -140,19 +153,5 @@ class StatelessEndpoint {
     src.close()
     content
   }
-
-  //      REVIEW
-  //      val dump = new StreamingOutput {
-  //        def write(out: OutputStream) {
-  //          try {
-  //            ontop.dump(List(r2rml))(meta_opt)(out, rdf_format)
-  //          } catch {
-  //            case err: Throwable =>
-  //              logger.error(err.getStackTrace.mkString("\n"))
-  //          }
-  //          out.flush()
-  //          out.close()
-  //        }
-  //      }
 
 }

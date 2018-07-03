@@ -70,6 +70,7 @@ import javax.inject.Inject
 import it.almawave.kb.http.providers.ConfigurationService
 import io.swagger.annotations.ExternalDocs
 import java.nio.charset.Charset
+import javax.ws.rs.QueryParam
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -85,7 +86,7 @@ class RDFProcessEndpoint {
    * TODO: process by stream
    */
   @GET
-  @Path("/datasets/{user}/{dataset: .+?}.{ext}")
+  @Path("/datasets/{group}/{dataset: .+?}.{ext}")
   @Consumes(Array(MediaType.APPLICATION_FORM_URLENCODED))
   @Produces(Array(MediaType.TEXT_PLAIN))
   @ExternalDocs(
@@ -95,16 +96,31 @@ class RDFProcessEndpoint {
     @PathParam("group")@DefaultValue("test") group:                                        String,
     @PathParam("dataset")@DefaultValue("territorial-classifications/regions.ttl") dataset: String,
     @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
+    @QueryParam("cached")@DefaultValue("true") cached:                                     Boolean,
     @Context req:                                                                          Request) = {
 
     // loading default, general configuration
     val conf = _configuration.conf
 
+    logger.debug(s"\n\nDEBUG> analyzing request.........................................")
+    logger.debug(s"GROUP: ${group}")
+    logger.debug(s"DATASET: ${dataset}")
+    logger.debug(s"EXT: ${ext}")
+
     val fs = new DatasetHelper(conf, s"${group}/${dataset}")
 
-    val dump_file = fs.saveRDFDump(ext)
+    val dump_path = fs.getRDFDumpPath(ext)
 
-    val _preview = fs.previewAsLines(dump_file)
+    if (!cached) {
+      // save DUMP su file
+      fs.saveRDFDump(dump_path)
+      logger.debug(s"RDF> saved dump file ${dump_path}")
+    } else {
+      logger.warn(s"RDF> using cached dump file ${dump_path}")
+    }
+
+    // loading preview
+    val _preview = fs.previewAsLines(dump_path)()
 
     Response
       .ok()

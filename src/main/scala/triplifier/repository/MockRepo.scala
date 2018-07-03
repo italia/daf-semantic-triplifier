@@ -28,6 +28,9 @@ import org.openrdf.query.parser.ParsedGraphQuery
 import java.io.OutputStream
 import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 
+/**
+ * this example should be extended to expose a minimal, simple SPARQL endpoint
+ */
 object MainMockRepo extends App {
 
   val rdf_url = new File("target/DUMP/test/territorial-classifications/regions.ttl")

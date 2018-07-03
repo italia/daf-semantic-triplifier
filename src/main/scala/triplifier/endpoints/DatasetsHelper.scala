@@ -9,6 +9,7 @@ import org.openrdf.rio.Rio
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+
 import java.nio.charset.Charset
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Config
@@ -45,37 +46,46 @@ class DatasetHelper(default_configuration: Config, path: String) {
 
   val rdf_processor: RDFProcessor = OntopProcessor(config)
 
-  def writeRDFDump(ext: String)(out: OutputStream) {
-    logger.debug(s"RDF> creating dump for ${path}.${ext}")
-    val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
+  def writeRDFDump(dump_path: Path)(out: OutputStream) {
+    logger.debug(s"RDF> creating dump for ${dump_path}")
+    val rdf_format = Rio.getWriterFormatForFileName(s"${dump_path}", RDFFormat.TURTLE)
     rdf_processor.dump(r2rmls)(Option(meta))(Option(rdf_extra))(out, rdf_format)
   }
 
-  def previewAsLines(path: Path): Seq[String] = {
-    Files.readAllLines(path, Charset.forName("UTF-8")).toStream
+  /**
+   * this method loads a pre-processed RDF dump, or part of it, as requested
+   */
+  def previewAsLines(path: Path)(from: Int = 0, until: Int = Int.MaxValue): Seq[String] = {
+    Files
+      .readAllLines(path, Charset.forName("UTF-8"))
+      .toStream
+      .slice(from, until)
   }
 
   // TODO: save configs
 
-  def saveRDFDump(ext: String): Path = {
+  def getRDFDumpPath(ext: String): Path = {
+    Paths.get(rdf_dump_dir, s"${path}.${ext}").toAbsolutePath().normalize()
+  }
 
-    val dump_path = Paths.get(rdf_dump_dir, s"${path}.${ext}").toAbsolutePath().normalize()
+  def saveRDFDump(dump_path: Path): Path = {
+
     logger.debug(s"RDF> saving file ${dump_path}")
 
     val dump_folder = dump_path.toFile().getParentFile
     if (!dump_folder.exists()) dump_folder.mkdirs()
     val fos = new FileOutputStream(dump_path.toFile())
-    this.writeRDFDump(ext)(fos)
+    this.writeRDFDump(dump_path)(fos)
     fos.close()
 
     dump_path
   }
 
-  def createRDFDumpAsString(ext: String): String = {
+  def createRDFDumpAsString(dump_path: Path): String = {
 
-    val rdf_format = Rio.getWriterFormatForFileName(s"${path}.${ext}", RDFFormat.TURTLE)
+    val rdf_format = Rio.getWriterFormatForFileName(s"${dump_path}", RDFFormat.TURTLE)
     val baos = new ByteArrayOutputStream
-    writeRDFDump(ext)(baos)
+    writeRDFDump(dump_path)(baos)
     val content = baos.toString(ENCODING)
     baos.close()
     content
