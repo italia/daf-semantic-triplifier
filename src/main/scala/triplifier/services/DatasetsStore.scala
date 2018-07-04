@@ -1,4 +1,4 @@
-package triplifier.endpoints
+package triplifier.services
 
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -6,14 +6,11 @@ import triplifier.processors.OntopProcessor
 import java.io.ByteArrayOutputStream
 import org.openrdf.rio.RDFFormat
 import org.openrdf.rio.Rio
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-
 import java.nio.charset.Charset
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Config
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import triplifier.processors.RDFProcessor
@@ -26,7 +23,7 @@ import org.slf4j.LoggerFactory
  *  TODO: review of DatasetHelper logic, refactorization
  *  TODO: DatasetsService
  */
-class DatasetHelper(default_configuration: Config, path: String) {
+class DatasetsStore(default_configuration: Config, path: String) {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -41,15 +38,15 @@ class DatasetHelper(default_configuration: Config, path: String) {
 
   val config = this.getDatasetConfig()
   val r2rmls = this.getR2RMLMappinglList()
-  val meta = this.getMetadata()
-  val rdf_extra = this.getAdditionalRDFData() //this.getAdditionalRDFData()
+  val meta: Option[String] = this.getMetadata()
+  val rdf_extra: Option[String] = this.getAdditionalRDFData() //this.getAdditionalRDFData()
 
   val rdf_processor: RDFProcessor = OntopProcessor(config)
 
   def writeRDFDump(dump_path: Path)(out: OutputStream) {
     logger.debug(s"RDF> creating dump for ${dump_path}")
     val rdf_format = Rio.getWriterFormatForFileName(s"${dump_path}", RDFFormat.TURTLE)
-    rdf_processor.dump(r2rmls)(Option(meta))(Option(rdf_extra))(out, rdf_format)
+    rdf_processor.dump(r2rmls)(meta)(rdf_extra)(out, rdf_format)
   }
 
   /**
@@ -94,6 +91,8 @@ class DatasetHelper(default_configuration: Config, path: String) {
 
   def getDatasetConfig(): Config = {
 
+    // TODO: fallback with default parent config
+
     val config_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".conf") }.head
     val configTxt = Files.readAllLines(config_path, CHARSET).mkString("\n")
     val config = ConfigFactory.parseString(configTxt)
@@ -110,19 +109,23 @@ class DatasetHelper(default_configuration: Config, path: String) {
     r2rmls
   }
 
-  def getMetadata(): String = {
-    val meta_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".metadata.ttl") }.head
-    val meta = Files.readAllLines(meta_path, CHARSET).mkString("\n")
-    meta
-  }
-
-  def getAdditionalRDFData(): String = {
+  def getMetadata(): Option[String] = {
 
     Files.list(dataset_dir).iterator().toList
-      .filterNot { p => p.toString().matches(".*?(.*?)\\.ttl") }
+      .filter { f => f.toString().endsWith(".metadata.ttl") }
+      .map { p => Files.readAllLines(p, CHARSET).mkString("\n") }
+      .headOption
+  }
+
+  def getAdditionalRDFData(): Option[String] = {
+
+    Files.list(dataset_dir).iterator().toList
+      .filter { p => p.toString().matches(".*.ttl") }
+      .filterNot { p => p.toString().matches(".*\\.r2rml\\..*") }
+      .filterNot { p => p.toString().matches(".*\\.metadata\\..*") }
       .map { rdf_extra =>
         Files.readAllLines(rdf_extra, CHARSET).mkString("\n")
-      }.mkString("\n")
+      }.headOption
 
   }
 

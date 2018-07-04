@@ -4,35 +4,70 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 @prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
 @prefix roapit: <https://w3id.org/italia/onto/RO/> .
-@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+@prefix tiapit: <https://w3id.org/italia/onto/TI/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> . 
 
 @base  <https://w3id.org/italia/> .
 
-
-<VIEW_incarichi_AMM> rr:sqlQuery """
+<VIEW_AMM_responsabili> rr:sqlQuery """
 
 SELECT DISTINCT 
-	LCASE(REGEXP_REPLACE(TRIM(AMM.titolo_resp), '\\s+', '-')) AS _RESP_TITOLO
-FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM 
+AMM.titolo_resp AS _AMM_RESPONSABILE_TITOLO  
+,AMM.cod_amm AS _AMM_CODICE 
+,AMM.des_amm AS _AMM_DESCRIZIONE 
+,AMM.cogn_resp AS _RESPONSABILE_COGNOME 
+,AMM.nome_resp AS _RESPONSABILE_NOME 
+,ABS(FNV_HASH(CONCAT(AMM.cogn_resp,AMM.nome_resp))) AS _RESPONSABILE_HASH 
+,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AMM.titolo_resp, '[-./,]', ' ')), '\\s+', '-')) AS _AMM_RESPONSABILE_ID 
+FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM
 
 """
 .
 
-<TriplesMap_IncarichiAmministrazioni> a rr:TriplesMapClass ;
 
-rr:logicalTable <VIEW_incarichi_AMM> ;
-	
+<TriplesMap_AMM_responsabili> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_AMM_responsabili> ;
+
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/data/role/{_RESP_TITOLO}" ;
-	rr:class roapit:Role ;
+	rr:template "https://w3id.org/italia/data/employment/{'_RESPONSABILE_HASH'}" ;
+	rr:class roapit:Employment ;
 ] ;
 
 rr:predicateObjectMap [ 
-	rr:predicate l0:name ; 
-	rr:objectMap [ rr:column "_RESP_TITOLO" ]
+	rr:predicate foaf:firstName ; 
+	rr:objectMap [ rr:column "_RESPONSABILE_NOME" ; ]
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate foaf:lastName ; 
+	rr:objectMap [ rr:column "_RESPONSABILE_COGNOME" ; ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:employmentFor ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organizations/{_AMM_CODICE}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate roapit:withRole ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/role/{'_AMM_RESPONSABILE_ID'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate tiapit:atTime ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/time-intervals/undefined" ;
+		rr:termType rr:IRI ;
+	] 
 ] ;
 
 
 .
-

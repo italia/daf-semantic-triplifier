@@ -71,6 +71,7 @@ import it.almawave.kb.http.providers.ConfigurationService
 import io.swagger.annotations.ExternalDocs
 import java.nio.charset.Charset
 import javax.ws.rs.QueryParam
+import triplifier.services.DatasetsStore
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -107,7 +108,7 @@ class RDFProcessEndpoint {
     logger.debug(s"DATASET: ${dataset}")
     logger.debug(s"EXT: ${ext}")
 
-    val fs = new DatasetHelper(conf, s"${group}/${dataset}")
+    val fs = new DatasetsStore(conf, s"${group}/${dataset}")
 
     val dump_path = fs.getRDFDumpPath(ext)
 
@@ -129,6 +130,8 @@ class RDFProcessEndpoint {
       .encoding("UTF-8")
       .lastModified(new Date())
       .build()
+      
+      // TODO: improve RDF/R2RML parsing with more efficient exception support
 
   }
 
