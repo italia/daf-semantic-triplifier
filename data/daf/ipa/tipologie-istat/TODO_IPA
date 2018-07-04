@@ -1,0 +1,19 @@
+
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+@prefix ti: <https://w3id.org/italia/onto/TI/> .
+
+<example-org> a covapit:PublicOrganization ;
+	covapit:IPAcode "SOME_CODE" ;
+	ti:hasPublicOrgActivityType <TYPE-00> ;
+	covapit:hasCategory <PA_CATEGORY_00> ;
+	covapit:IPAcode "SOME CODE..." ;
+.
+	
+<PA_CATEGORY_00> a covapit:PublicOrganizationCategory> .
+
+<TYPE-00> a ti:PublicOrgActivityType ;
+.
+# TODO: COFOG + verifica codici ISTAT con COFOG...
+
+
+SEE https://w3id.org/italia/onto/TI/PublicOrgActivityType

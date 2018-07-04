@@ -36,5 +36,7 @@ rr:predicateObjectMap [
 	rr:objectMap [ rr:column "_TIPOLOGIA_AMMINISTRAZIONE_DESCRIZIONE" ; rr:language "it" ]
 ] ;
 
+# TODO: identifier
+
 .
 

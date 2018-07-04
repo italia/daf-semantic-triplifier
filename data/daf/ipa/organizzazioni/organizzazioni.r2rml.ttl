@@ -1,0 +1,79 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+
+@base  <https://w3id.org/italia/> .
+
+<VIEW_Organizzazioni> rr:sqlQuery """
+
+SELECT DISTINCT 
+AMM.cod_amm AS _AMM_CODICE
+,AMM.acronimo AS _AMM_ACRONIMO
+,AMM.des_amm AS _AMM_DESCRIZIONE
+,ABS(FNV_HASH(AMM.tipologia_amm)) AS _TIPOLOGIA_AMMINISTRAZIONE_HASH
+,ABS(FNV_HASH(AMM.tipologia_istat)) AS _TIPOLOGIA_ISTAT_HASH
+,ABS(FNV_HASH(CONCAT(AMM.cogn_resp,AMM.nome_resp))) AS _RESPONSABILE_HASH 
+FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM
+
+"""
+.
+
+
+<TriplesMap_Organizzazioni> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_Organizzazioni> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/data/organization/public-organization/{_AMM_CODICE}" ;
+	rr:class covapit:PublicOrganization ;
+] ;
+
+
+# TODO: hasPublicOrgActivityType
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:legalName, l0:description ; 
+	rr:objectMap [ rr:column "_AMM_DESCRIZIONE" ; rr:language "it" ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:IPAcode; 
+	rr:objectMap [ rr:column "_AMM_CODICE" ; ] # TODO: Identifier
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:acronym ; 
+	rr:objectMap [ rr:column "_AMM_ACRONIMO" ]
+] ;
+
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:holdEmployment ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/employment/{'_RESPONSABILE_HASH'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:hasCategory ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organization/public-organization/tipologies/{'_TIPOLOGIA_ISTAT_HASH'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+# NOTA: deve esserci una sola categoria!
+# rr:predicateObjectMap [ 
+# 	rr:predicate covapit:hasCategory ; 
+# 	rr:objectMap [ 
+# 		rr:template "https://w3id.org/italia/data/organization/public-organization/tipologies/{'_TIPOLOGIA_AMMINISTRAZIONE_HASH'}" ;
+# 		rr:termType rr:IRI ;
+# 	] 
+# ] ;
+
+.
+

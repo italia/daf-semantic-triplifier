@@ -26,7 +26,6 @@ import org.openrdf.query.parser.QueryParserUtil
 import org.openrdf.query.parser.ParsedBooleanQuery
 import org.openrdf.query.parser.ParsedGraphQuery
 import java.io.OutputStream
-import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 
 /**
  * this example should be extended to expose a minimal, simple SPARQL endpoint

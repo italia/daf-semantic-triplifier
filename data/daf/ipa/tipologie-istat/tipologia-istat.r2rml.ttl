@@ -7,8 +7,6 @@
 
 @base  <https://w3id.org/italia/> .
 
-# regioni 
-
 <VIEW_tipologia_istat> rr:sqlQuery """
 
 SELECT DISTINCT 
@@ -35,6 +33,8 @@ rr:predicateObjectMap [
 	rr:predicate l0:description ; 
 	rr:objectMap [ rr:column "_TIPOLOGIA_ISTAT_DESCRIZIONE" ; rr:language "it" ]
 ] ;
+
+# TODO: identifier
 
 .
 

@@ -130,8 +130,8 @@ class RDFProcessEndpoint {
       .encoding("UTF-8")
       .lastModified(new Date())
       .build()
-      
-      // TODO: improve RDF/R2RML parsing with more efficient exception support
+
+    // TODO: improve RDF/R2RML parsing with more efficient exception support
 
   }
 
