@@ -97,7 +97,7 @@ class RDFProcessEndpoint {
     @PathParam("group")@DefaultValue("test") group:                                        String,
     @PathParam("dataset")@DefaultValue("territorial-classifications/regions.ttl") dataset: String,
     @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
-    @QueryParam("cached")@DefaultValue("true") cached:                                     Boolean,
+    @QueryParam("cached")@DefaultValue("false") cached:                                     Boolean,
     @Context req:                                                                          Request) = {
 
     // loading default, general configuration
