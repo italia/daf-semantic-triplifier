@@ -1,0 +1,86 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+
+@base  <https://w3id.org/italia/> .
+
+
+<VIEW_UOO> rr:sqlQuery """
+
+SELECT DISTINCT 
+UOO.cod_ou AS _UOO_CODICE 
+,UOO.cod_uni_ou AS _UOO_CODICE_ID 
+,UOO.cod_ou_padre AS _UOO_CODICE_PADRE 
+,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(UOO.cod_ou, '[-./,]', ' ')), '\\s+', '-')) AS _AOO_ID 
+,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(UOO.indirizzo, '[-./,]', ' ')), '\\s+', '-')) AS _ADDRESS_ID 
+,UOO.des_ou AS _UOO_DESCRIZIONE  
+,UOO.indirizzo AS _UOO_INDIRIZZO 
+,UOO.cod_amm AS _AMM_CODICE
+,UOO.cod_aoo AS _AOO_CODICE 
+FROM opendata.agid_o_unita_organizzative_stage_parquet AS UOO
+
+"""
+.
+
+# TODO: subOrganizationOf
+
+
+<TriplesMap_UOO> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_UOO> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/data/organization/office/{_UOO_CODICE_ID}" ;
+	rr:class covapit:Office, covapit:SupportUnit ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:legalName, l0:description ; 
+	rr:objectMap [ rr:column "_UOO_DESCRIZIONE" ; rr:language "it" ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:IPAcode; 
+	rr:objectMap [ rr:column "_UOO_CODICE" ; ] # TODO: Identifier
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate covapit:IPAcode; 
+	rr:objectMap [ rr:column "_UOO_CODICE_ID" ; ] # TODO: Identifier
+] ;
+
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:subOrganizationOf ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organization/office/{_UOO_CODICE_PADRE}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate covapit:isPartOf ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organization/support-unit/{_AOO_CODICE}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+rr:predicateObjectMap [ 
+	rr:predicate covapit:isSupportUnitOf ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organization/public-organization/{_AMM_CODICE}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:hasAddress ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/address/{_ADDRESS_ID}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.
