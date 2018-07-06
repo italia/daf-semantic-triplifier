@@ -9,7 +9,7 @@
 
 @base  <https://w3id.org/italia/> .
 
-<VIEW_AMM_luoghi> rr:sqlQuery """
+<VIEW_AOO_indirizzi> rr:sqlQuery """
 
 SELECT DISTINCT 
 AOO.cod_aoo AS _AOO_CODICE 
@@ -42,9 +42,9 @@ WHERE(INSTR(AOO._REGIONE_TXT,ISTAT._REGIONE_TXT) != 0)
 .
 
 
-<TriplesMap_AMM_luoghi> a rr:TriplesMapClass ;
+<TriplesMap_AOO_indirizzi> a rr:TriplesMapClass ;
 
-rr:logicalTable <VIEW_AMM_luoghi> ;
+rr:logicalTable <VIEW_AOO_indirizzi> ;
 
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/data/address/{'_ADDRESS_ID'}" ;

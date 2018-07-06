@@ -18,6 +18,8 @@ import java.io.OutputStream
 import java.nio.file.Path
 import java.io.FileOutputStream
 import org.slf4j.LoggerFactory
+import scala.util.Random
+import java.net.URI
 
 /*
  *  TODO: review of DatasetHelper logic, refactorization
@@ -37,7 +39,7 @@ class DatasetsStore(default_configuration: Config, path: String) {
   val dataset_dir = Paths.get(r2rml_base_path, s"${path}").toAbsolutePath().normalize()
 
   val config = this.getDatasetConfig()
-  val r2rmls = this.getR2RMLMappinglList()
+  val r2rmls = this.getR2RMLMappinglList().map(_._2)
   val meta: Option[String] = this.getMetadata()
   val rdf_extra: Option[String] = this.getAdditionalRDFData() //this.getAdditionalRDFData()
 
@@ -53,10 +55,14 @@ class DatasetsStore(default_configuration: Config, path: String) {
    * this method loads a pre-processed RDF dump, or part of it, as requested
    */
   def previewAsLines(path: Path)(from: Int = 0, until: Int = Int.MaxValue): Seq[String] = {
+
+    // TODO: random sub-sequence
+    // TODO: add a preview as RDF feature...
     Files
       .readAllLines(path, Charset.forName("UTF-8"))
       .toStream
       .slice(from, until)
+
   }
 
   // TODO: save configs
@@ -103,9 +109,11 @@ class DatasetsStore(default_configuration: Config, path: String) {
 
   }
 
-  def getR2RMLMappinglList() = {
+  def getR2RMLMappinglList(): Seq[(URI, String)] = {
     val r2rml_paths = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".r2rml.ttl") }.toList
-    val r2rmls = r2rml_paths.map { r2rml_path => Files.readAllLines(r2rml_path, CHARSET).mkString("\n") }.toList
+    val r2rmls = r2rml_paths.map { r2rml_path =>
+      (r2rml_path.toUri(), Files.readAllLines(r2rml_path, CHARSET).mkString("\n"))
+    }.toList
     r2rmls
   }
 

@@ -72,6 +72,9 @@ import io.swagger.annotations.ExternalDocs
 import java.nio.charset.Charset
 import javax.ws.rs.QueryParam
 import triplifier.services.DatasetsStore
+import scala.util.Random
+import java.io.OutputStreamWriter
+import java.io.BufferedWriter
 
 @Api(tags = Array("RDF processor"))
 @Path("/triplify")
@@ -97,7 +100,7 @@ class RDFProcessEndpoint {
     @PathParam("group")@DefaultValue("test") group:                                        String,
     @PathParam("dataset")@DefaultValue("territorial-classifications/regions.ttl") dataset: String,
     @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
-    @QueryParam("cached")@DefaultValue("false") cached:                                     Boolean,
+    @QueryParam("cached")@DefaultValue("false") cached:                                    Boolean,
     @Context req:                                                                          Request) = {
 
     // loading default, general configuration
@@ -125,7 +128,7 @@ class RDFProcessEndpoint {
 
     Response
       .ok()
-      .entity(_preview.mkString("\n"))
+      .entity(LinesResponseStreaming(_preview: _*))
       .`type`(MediaType.TEXT_PLAIN + "; charset=UTF-8") // CHECK: bodywriter per RDF...
       .encoding("UTF-8")
       .lastModified(new Date())
@@ -151,4 +154,18 @@ class RDFProcessEndpoint {
     content
   }
 
+}
+
+object LinesResponseStreaming {
+  def apply(lines: String*) = {
+    new StreamingOutput() {
+      override def write(out: OutputStream) {
+        lines.foreach { line =>
+          out.write(line.getBytes)
+          out.write("\n".getBytes)
+        }
+        out.flush()
+      }
+    }
+  }
 }

@@ -15,7 +15,7 @@ SELECT DISTINCT
 UOO.cod_ou AS _UOO_CODICE 
 ,UOO.cod_uni_ou AS _UOO_CODICE_ID 
 ,UOO.cod_ou_padre AS _UOO_CODICE_PADRE 
-,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(UOO.cod_ou, '[-./,]', ' ')), '\\s+', '-')) AS _AOO_ID 
+,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(UOO.cod_ou, '[-./,]', ' ')), '\\s+', '-')) AS _UOO_ID 
 ,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(UOO.indirizzo, '[-./,]', ' ')), '\\s+', '-')) AS _ADDRESS_ID 
 ,UOO.des_ou AS _UOO_DESCRIZIONE  
 ,UOO.indirizzo AS _UOO_INDIRIZZO 
@@ -26,15 +26,13 @@ FROM opendata.agid_o_unita_organizzative_stage_parquet AS UOO
 """
 .
 
-# TODO: subOrganizationOf
-
 
 <TriplesMap_UOO> a rr:TriplesMapClass ;
 
 rr:logicalTable <VIEW_UOO> ;
 	
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/data/organization/office/{_UOO_CODICE_ID}" ;
+	rr:template "https://w3id.org/italia/data/organization/office/{_UOO_CODICE}" ;
 	rr:class covapit:Office, covapit:SupportUnit ;
 ] ;
 
@@ -43,12 +41,13 @@ rr:predicateObjectMap [
 	rr:objectMap [ rr:column "_UOO_DESCRIZIONE" ; rr:language "it" ]
 ] ;
 
+
 rr:predicateObjectMap [ 
-	rr:predicate covapit:IPAcode; 
+	rr:predicate covapit:officeIdentifier ; 
 	rr:objectMap [ rr:column "_UOO_CODICE" ; ] # TODO: Identifier
 ] ;
 rr:predicateObjectMap [ 
-	rr:predicate covapit:IPAcode; 
+	rr:predicate covapit:officeIdentifier ; 
 	rr:objectMap [ rr:column "_UOO_CODICE_ID" ; ] # TODO: Identifier
 ] ;
 

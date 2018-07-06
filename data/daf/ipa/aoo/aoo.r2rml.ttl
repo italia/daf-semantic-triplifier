@@ -40,10 +40,9 @@ rr:predicateObjectMap [
 ] ;
 
 rr:predicateObjectMap [ 
-	rr:predicate covapit:IPAcode; 
-	rr:objectMap [ rr:column "_AOO_CODICE" ; ] # TODO: Identifier
+	rr:predicate covapit:AOOIdentifier; 
+	rr:objectMap [ rr:column "_AOO_CODICE" ; ]
 ] ;
-
 
 rr:predicateObjectMap [ 
 	rr:predicate covapit:isSupportUnitOf ; 

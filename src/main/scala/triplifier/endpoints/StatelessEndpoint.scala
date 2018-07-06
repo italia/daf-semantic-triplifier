@@ -109,6 +109,7 @@ class StatelessEndpoint {
       //      ontop.dump(List(r2rml))(meta_opt)(None)(baos, rdf_format)
       //      val dump = baos.toString("UTF-8")
 
+      // TODO: refactorize the streaming output for ontop
       val ontop = OntopProcessor(config)
       val dump = new StreamingOutput {
         def write(out: OutputStream) {
