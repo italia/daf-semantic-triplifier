@@ -71,7 +71,7 @@ import it.almawave.kb.http.providers.ConfigurationService
 import io.swagger.annotations.ExternalDocs
 import java.nio.charset.Charset
 import javax.ws.rs.QueryParam
-import triplifier.services.DatasetsStore
+import triplifier.services.SingleDatasetStore
 import scala.util.Random
 import java.io.OutputStreamWriter
 import java.io.BufferedWriter
@@ -111,7 +111,7 @@ class RDFProcessEndpoint {
     logger.debug(s"DATASET: ${dataset}")
     logger.debug(s"EXT: ${ext}")
 
-    val fs = new DatasetsStore(conf, s"${group}/${dataset}")
+    val fs = new SingleDatasetStore(conf, s"${group}/${dataset}")
 
     val dump_path = fs.getRDFDumpPath(ext)
 

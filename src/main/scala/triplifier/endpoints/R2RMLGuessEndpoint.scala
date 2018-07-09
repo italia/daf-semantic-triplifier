@@ -60,7 +60,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import it.almawave.kb.http.utils.AsyncHelper._
 import triplifier.processors.RDFMapper
 
-@Api(tags = Array("R2RMl"))
+@Api(tags = Array("R2RML draft"))
 @Path("/triplification")
 class R2RMLDraftEndpoint {
 

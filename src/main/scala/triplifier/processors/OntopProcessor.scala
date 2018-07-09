@@ -80,6 +80,12 @@ object OntopProcessor {
 
 }
 
+object RDFProcessor {
+
+  def ontop(config: Config) = new OntopProcessor(config)
+
+}
+
 // TODO
 trait RDFProcessor {
 

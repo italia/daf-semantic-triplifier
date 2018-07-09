@@ -1,0 +1,63 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+@prefix l0: <https://w3id.org/italia/onto/l0/> .
+@prefix covapit: <https://w3id.org/italia/onto/COV/> .
+@prefix clvapit: <https://w3id.org/italia/onto/CLV/> .
+
+@base  <https://w3id.org/italia/> .
+
+
+<VIEW_AOO> rr:sqlQuery """
+
+SELECT DISTINCT 
+AOO.cod_aoo AS _AOO_CODICE 
+,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AOO.cod_aoo, '[-./,]', ' ')), '\\s+', '-')) AS _AOO_ID 
+,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AOO.indirizzo, '[-./,]', ' ')), '\\s+', '-')) AS _ADDRESS_ID 
+,AOO.des_aoo AS _AOO_DESCRIZIONE 
+,AOO.dat_istituz AS _AOO_DATA_ISTITUZIONE 
+,AOO.indirizzo AS _AOO_INDIRIZZO 
+,AOO.cod_amm AS _AMM_CODICE
+FROM opendata.agid_o_aoo_stage_parquet AS AOO 
+
+"""
+.
+
+
+<TriplesMap_AOO> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_AOO> ;
+	
+rr:subjectMap [ 
+	rr:template "https://w3id.org/italia/data/organization/support-unit/{_AMM_CODICE}#{_AOO_ID}" ;
+	rr:class covapit:HomogeneousOrganizationalArea, covapit:SupportUnit ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:legalName, l0:description ; 
+	rr:objectMap [ rr:column "_AOO_DESCRIZIONE" ; rr:language "it" ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:AOOIdentifier; 
+	rr:objectMap [ rr:column "_AOO_CODICE" ; ]
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate covapit:isSupportUnitOf ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/organization/public-organization/{_AMM_CODICE}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:hasAddress ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/address/{_ADDRESS_ID}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.

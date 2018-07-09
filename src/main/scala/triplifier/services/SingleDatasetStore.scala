@@ -11,8 +11,6 @@ import scala.collection.JavaConverters._
 import java.nio.charset.Charset
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Config
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import triplifier.processors.RDFProcessor
 import java.io.OutputStream
 import java.nio.file.Path
@@ -20,12 +18,45 @@ import java.io.FileOutputStream
 import org.slf4j.LoggerFactory
 import scala.util.Random
 import java.net.URI
+import java.io.File
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import scala.util.Try
+
+class DatasetsStore(default_configuration: Config) {
+
+  val logger = LoggerFactory.getLogger(this.getClass)
+
+  val r2rml_base_path: String = default_configuration.getString("r2rml.path")
+  val dir_path = Paths.get(r2rml_base_path)
+
+  def datasetsPathsList() = {
+
+    FileStore.getPathList(dir_path)
+      .filter { p => p.toString().contains("r2rml") }
+      .map { p => p.getParent }
+
+  }
+
+  def datasets = {
+
+    datasetsPathsList.map { p =>
+
+      val local: String = p.toString().replace(r2rml_base_path.toString(), "")
+      new SingleDatasetStore(default_configuration, local)
+
+    }
+
+  }
+
+}
 
 /*
  *  TODO: review of DatasetHelper logic, refactorization
  *  TODO: DatasetsService
  */
-class DatasetsStore(default_configuration: Config, path: String) {
+class SingleDatasetStore(default_configuration: Config, path: String) {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -38,12 +69,14 @@ class DatasetsStore(default_configuration: Config, path: String) {
   // each dataset will be related to an actual local path, from which the configs are loaded...
   val dataset_dir = Paths.get(r2rml_base_path, s"${path}").toAbsolutePath().normalize()
 
-  val config = this.getDatasetConfig()
-  val r2rmls = this.getR2RMLMappinglList().map(_._2)
-  val meta: Option[String] = this.getMetadata()
-  val rdf_extra: Option[String] = this.getAdditionalRDFData() //this.getAdditionalRDFData()
+  // REVIEW the chain here
+  lazy val config = this.getDatasetConfig().get
+  lazy val r2rmls = this.getR2RMLMappinglList().map(_._2)
+  lazy val meta: Option[String] = this.getMetadata()
+  lazy val rdf_extra: Option[String] = this.getAdditionalRDFData() //this.getAdditionalRDFData()
 
-  val rdf_processor: RDFProcessor = OntopProcessor(config)
+  // ideally, here we could change RDF processor by configuration, at some point
+  val rdf_processor: RDFProcessor = RDFProcessor.ontop(config)
 
   def writeRDFDump(dump_path: Path)(out: OutputStream) {
     logger.debug(s"RDF> creating dump for ${dump_path}")
@@ -95,11 +128,17 @@ class DatasetsStore(default_configuration: Config, path: String) {
 
   }
 
-  def getDatasetConfig(): Config = {
+  /*
+   * This method loads a configuration oobject for the dataset
+   */
+  def getDatasetConfig(): Try[Config] = Try {
 
     // TODO: fallback with default parent config
 
-    val config_path = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".conf") }.head
+    val config_path = FileStore.getPathList(dataset_dir)
+      .filter { f => f.toString().endsWith(".conf") }
+      .head
+
     val configTxt = Files.readAllLines(config_path, CHARSET).mkString("\n")
     val config = ConfigFactory.parseString(configTxt)
 
@@ -109,10 +148,32 @@ class DatasetsStore(default_configuration: Config, path: String) {
 
   }
 
+  def readFile(path: Path): Try[String] = Try {
+
+    if (!Files.exists(path)) throw new RuntimeException(s"path ${path} not found!")
+    Files.readAllLines(path, CHARSET).mkString("\n")
+
+  }
+
+  def saveFile(path: Path, content: String): Try[Path] = Try {
+
+    val file_path = path.toAbsolutePath().normalize()
+    val dir = file_path.getParent.toFile()
+
+    if (!dir.exists()) dir.mkdirs()
+
+    logger.debug(s"writing ${file_path}")
+
+    Files.write(file_path, content.getBytes)
+
+    file_path
+
+  }
+
   def getR2RMLMappinglList(): Seq[(URI, String)] = {
-    val r2rml_paths = Files.list(dataset_dir).iterator().toList.filter { f => f.toString().endsWith(".r2rml.ttl") }.toList
+    val r2rml_paths = FileStore.getPathList(dataset_dir).filter { f => f.toString().endsWith(".r2rml.ttl") }.toList
     val r2rmls = r2rml_paths.map { r2rml_path =>
-      (r2rml_path.toUri(), Files.readAllLines(r2rml_path, CHARSET).mkString("\n"))
+      (r2rml_path.toUri(), readFile(r2rml_path).getOrElse("# no content"))
     }.toList
     r2rmls
   }
@@ -138,6 +199,26 @@ class DatasetsStore(default_configuration: Config, path: String) {
   }
 
 }
+
+object MainSingleDatasetStore extends App {
+
+  val group = "daf"
+  val dataset = "ipa/indirizzi"
+  val conf = ConfigFactory.parseFile(new File("conf/triplifier.conf"))
+  val fs = new SingleDatasetStore(conf, s"${group}/${dataset}")
+
+  FileStore.getPathList(Paths.get("data/daf"))
+    .filter { p => p.toString().contains("r2rml") }
+    .foreach { path =>
+      println(path)
+    }
+
+  fs.saveFile(Paths.get("../testing/another_one.r2rml.ttl"), "testing.....").get
+
+  new DatasetsStore(conf)
+
+}
+
 
 
 
