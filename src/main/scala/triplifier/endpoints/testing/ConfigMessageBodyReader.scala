@@ -1,4 +1,4 @@
-package triplifier.endpoints
+package triplifier.endpoints.testing
 
 import javax.ws.rs.ext.MessageBodyReader
 import java.lang.annotation.Annotation

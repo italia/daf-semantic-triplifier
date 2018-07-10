@@ -26,17 +26,19 @@ import org.openrdf.query.parser.QueryParserUtil
 import org.openrdf.query.parser.ParsedBooleanQuery
 import org.openrdf.query.parser.ParsedGraphQuery
 import java.io.OutputStream
+import java.nio.file.Paths
 
 /**
  * this example should be extended to expose a minimal, simple SPARQL endpoint
  */
 object MainMockRepo extends App {
 
-  val rdf_url = new File("target/DUMP/test/territorial-classifications/regions.ttl")
-    .getAbsoluteFile
-    .toURI().toURL()
+  val rdf_url = Paths.get("target/DUMP/test/territorial-classifications/regions.ttl")
+    .toAbsolutePath().normalize()
+    .toUri().toURL()
 
   val mock = new MockRepo()
+  mock.start()
   mock.load(rdf_url)
 
   val _query = """
@@ -53,8 +55,10 @@ object MainMockRepo extends App {
 
   //  mock.check_query(_query)
 
-  mock.query(_query, "json")(System.out)
+  mock.endpoint.query(_query, "csv")(System.out)
 
+  mock.stop()
+  
 }
 
 class MockRepo() {
@@ -62,36 +66,47 @@ class MockRepo() {
   val baseURI = "http://sparql/"
 
   val repo = new SailRepository(new MemoryStore)
-  if (!repo.isInitialized()) repo.initialize()
 
-  def query(query: String, format: String = "csv")(out: OutputStream) = {
+  def start() = {
+    if (!repo.isInitialized()) repo.initialize()
+  }
+  
+  def stop() = {
+    if (repo.isInitialized()) repo.shutDown()
+  }
 
-    val parsed = QueryParserUtil.parseQuery(QueryLanguage.SPARQL, query, baseURI)
+  object endpoint {
 
-    val conn = repo.getConnection
+    def query(query: String, format: String = "csv")(out: OutputStream) = {
 
-    parsed match {
+      val parsed = QueryParserUtil.parseQuery(QueryLanguage.SPARQL, query, baseURI)
 
-      case tuples: ParsedTupleQuery =>
-        val result_format = QueryResultIO.getWriterFormatForFileName("DUMP." + format)
-        val writer = QueryResultIO.createWriter(result_format, out)
-        conn.prepareTupleQuery(QueryLanguage.SPARQL, query)
-          .evaluate(writer)
+      val conn = repo.getConnection
 
-      case bool: ParsedBooleanQuery =>
-        val result = conn.prepareBooleanQuery(QueryLanguage.SPARQL, query).evaluate()
-        out.write(result.toString().getBytes)
+      parsed match {
 
-      case graph: ParsedGraphQuery =>
-        val writer = Rio.createWriter(Rio.getWriterFormatForFileName("DUMP." + format), out)
-        conn.prepareGraphQuery(QueryLanguage.SPARQL, query, baseURI)
-          .evaluate(writer)
+        case tuples: ParsedTupleQuery =>
+          val result_format = QueryResultIO.getWriterFormatForFileName("DUMP." + format)
+          val writer = QueryResultIO.createWriter(result_format, out)
+          conn.prepareTupleQuery(QueryLanguage.SPARQL, query)
+            .evaluate(writer)
 
-      case _ => throw new RuntimeException("CAN'tPARSE!...")
+        case bool: ParsedBooleanQuery =>
+          val result = conn.prepareBooleanQuery(QueryLanguage.SPARQL, query).evaluate()
+          out.write(result.toString().getBytes)
 
+        case graph: ParsedGraphQuery =>
+          val writer = Rio.createWriter(Rio.getWriterFormatForFileName("DUMP." + format), out)
+          conn.prepareGraphQuery(QueryLanguage.SPARQL, query, baseURI)
+            .evaluate(writer)
+
+        case _ => throw new RuntimeException("CAN'tPARSE!...")
+
+      }
+
+      conn.close()
     }
 
-    conn.close()
   }
 
   def load(rdf_url: URL) {

@@ -10,7 +10,7 @@ import it.almawave.kb.http.providers.ConfigurationService
 import javax.ws.rs.core.Response
 import java.util.Date
 
-@Api
+@Api(tags = Array("testing"))
 @Path("/configuration")
 class ConfigurationEndpoint {
 

@@ -98,7 +98,7 @@ class RDFProcessEndpoint {
     url = "/kb/api/v1/triplify/datasets/test/territorial-classifications/regions.ttl")
   def createRDFByMapping(
     @PathParam("group")@DefaultValue("test") group:                                        String,
-    @PathParam("dataset")@DefaultValue("territorial-classifications/regions.ttl") dataset: String,
+    @PathParam("dataset")@DefaultValue("territorial-classifications/regions") dataset: String,
     @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
     @QueryParam("cached")@DefaultValue("false") cached:                                    Boolean,
     @Context req:                                                                          Request) = {

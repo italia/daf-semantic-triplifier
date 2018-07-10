@@ -1,10 +1,9 @@
-package triplifier.endpoints
+package triplifier.endpoints.r2rml
 
 import io.swagger.annotations.Api
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.GET
-import javax.ws.rs.core.MediaType
 import triplifier.services.SingleDatasetStore
 import javax.ws.rs.PathParam
 import javax.ws.rs.DefaultValue
@@ -14,17 +13,12 @@ import javax.ws.rs.core.Response
 import java.nio.file.Paths
 import io.swagger.models.parameters.BodyParameter
 import javax.ws.rs.POST
-import com.typesafe.config.ConfigValue
-import com.typesafe.config.ConfigValueFactory
 import java.io.FileOutputStream
-import com.typesafe.config.ConfigFactory
-import org.slf4j.LoggerFactory
-import java.nio.file.FileSystems
 import javax.ws.rs.DELETE
 import java.nio.file.Files
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import javax.ws.rs.core.MediaType
 
 @Api(tags = Array("R2RML editing"))
 @Path("/triplify")
