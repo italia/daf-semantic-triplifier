@@ -2,6 +2,9 @@ package triplifier.repository
 
 import org.openrdf.query.algebra.QueryModelVisitor
 
+/**
+ * The QueryModelVisitor could help us managing the conventional structure of a query
+ */
 class CustomQueryModelVisitor extends QueryModelVisitor[Exception] {
 
   def meet(x$1: org.openrdf.query.algebra.ZeroLengthPath): Unit = ???

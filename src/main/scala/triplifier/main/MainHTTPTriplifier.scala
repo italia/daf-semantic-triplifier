@@ -11,6 +11,7 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.Config
+import triplifier.endpoints.RepoService
 
 /**
  * this is just used for starting the embedded server
@@ -27,14 +28,15 @@ object MainHTTPTriplifier extends App {
     .resolve()
 
   val http = HTTP(conf)
+  http.resource_config
+    .registerInstances(new RepoService())
+  // .registerInstances(new ContextListenerFilter)
 
   http.start
 
 }
 
-
-//CHECK
-
+// TODO: add unit tests
 // http://localhost:7777/kb/api/v1/swagger.json
 // http://localhost:7777/kb/api/v1/application.wadl
 // http://localhost:7777/static/rdf-process.html
