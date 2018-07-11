@@ -22,7 +22,7 @@ import javax.ws.rs.Encoded
 import io.swagger.models.parameters.FormParameter
 
 @Api(tags = Array("SPARQL"))
-@Path("/sparql")
+@Path("/repository")
 class MockSPARQLEndpoint {
 
   @Inject var mock_service: RepoService = null
@@ -31,11 +31,20 @@ class MockSPARQLEndpoint {
   // TODO: consider wrapping a SELECT * around the CONSTRUCTs...
 
   @POST
+  @Path("/update")
+  def update(query: String) {
+
+    mock_service.repo.endpoint.update(query)
+
+  }
+
+  @POST
+  @Path("/sparql")
   def sparql(
     @DefaultValue("SELECT DISTINCT ?concept WHERE { ?s a ?concept }") query: String,
     @DefaultValue("csv")@QueryParam("format") format:                        String) = {
 
-    println("\nMOCK2 @ " + mock_service.hashCode())
+    //    println("\nMOCK2 @ " + mock_service.hashCode())
 
     val sparql_results = new StreamingOutput {
       def write(out: OutputStream) {

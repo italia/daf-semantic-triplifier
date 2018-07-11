@@ -29,14 +29,14 @@ class RepoService {
   val repo = new MockRepo()
   repo.start()
 
-  println("\nMOCK1 @ " + this.hashCode())
+  //  println("\nMOCK1 @ " + this.hashCode())
 
   // LOADING EXAMPLE DATA
-  repo.load(rdf_url)
+  //  repo.load(rdf_url)
 
   // QUERY ON EXAMPLE DATA
-  println("EXAMPLE QUERY.....................")
-  repo.endpoint.query("""SELECT DISTINCT ?concept WHERE { ?s a ?concept }""", "csv")(System.out)
-  println("EXAMPLE QUERY.....................")
+  //  println("EXAMPLE QUERY.....................")
+  //  repo.endpoint.query("""SELECT DISTINCT ?concept WHERE { ?s a ?concept }""", "csv")(System.out)
+  //  println("EXAMPLE QUERY.....................")
 
 }

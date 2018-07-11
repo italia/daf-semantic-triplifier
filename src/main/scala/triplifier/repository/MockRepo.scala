@@ -42,6 +42,8 @@ object MainMockRepo extends App {
     .toAbsolutePath().normalize()
     .toUri().toURL()
 
+  println("rdf_url: " + rdf_url)
+
   val mock = new MockRepo()
   mock.start()
   //  mock.load(rdf_url)
