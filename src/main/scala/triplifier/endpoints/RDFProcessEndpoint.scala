@@ -97,19 +97,19 @@ class RDFProcessEndpoint {
     value = "endpoint for local testing",
     url = "/kb/api/v1/triplify/datasets/test/territorial-classifications/regions.ttl")
   def createRDFByMapping(
-    @PathParam("group")@DefaultValue("test") group:                                        String,
+    @PathParam("group")@DefaultValue("test") group:                                    String,
     @PathParam("dataset")@DefaultValue("territorial-classifications/regions") dataset: String,
-    @PathParam("ext")@DefaultValue("ttl") ext:                                             String,
-    @QueryParam("cached")@DefaultValue("false") cached:                                    Boolean,
-    @Context req:                                                                          Request) = {
+    @PathParam("ext")@DefaultValue("ttl") ext:                                         String,
+    @QueryParam("cached")@DefaultValue("false") cached:                                Boolean,
+    @Context req:                                                                      Request) = {
 
     // loading default, general configuration
     val conf = _configuration.conf
 
-    logger.debug(s"\n\nDEBUG> analyzing request.........................................")
-    logger.debug(s"GROUP: ${group}")
-    logger.debug(s"DATASET: ${dataset}")
-    logger.debug(s"EXT: ${ext}")
+    //    logger.debug(s"\n\nDEBUG> analyzing request.........................................")
+    //    logger.debug(s"GROUP: ${group}")
+    //    logger.debug(s"DATASET: ${dataset}")
+    //    logger.debug(s"EXT: ${ext}")
 
     val fs = new SingleDatasetStore(conf, s"${group}/${dataset}")
 

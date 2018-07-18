@@ -53,6 +53,7 @@ class DatasetsStore(default_configuration: Config) {
 }
 
 /*
+ * 	TODO: refactorize this class, isolating the RDF process
  *  TODO: review of DatasetHelper logic, refactorization
  *  TODO: DatasetsService
  */

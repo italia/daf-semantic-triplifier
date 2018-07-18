@@ -2,7 +2,7 @@
 RDF triplifier
 =========================
 
-[README last update: 2018-06-06] *pre-alpha* version
+[README last update: 2018-07-11] *pre-alpha* version
 
 This component provides a simple microservice for creating an RDF representation of data from a JDBC connector.
 
@@ -18,6 +18,7 @@ the `ssl_impala` folder should be created under the root folder of the project, 
 │       master-impala.jks
 │       master-impala.pem
 ```
+
 
 * * *
 
@@ -119,6 +120,13 @@ java -cp "target/target/triplifier-0.0.2-SNAPSHOT.jar;target/libs/*" triplifier.
 + update `DockerFile`
 + merge of external manual swagger definitions
 + fix swagger problems with multi-lines: try updating to version 3+
++ add an internal interlinking strategy, using silk/duke
+
+Ideally we could imagine having some specific microservices:
++ one for handling merging of RDF, and direct publication
++ one for creating relations between the current datasource and an external target, using silk or duke
+
+
 
 
 

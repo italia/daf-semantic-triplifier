@@ -131,7 +131,9 @@ class R2RMLDataset {
 
   }
 
-  // TODO list of possible dataset
+  // TODO: a list of possible dataset
+
+  // TODO: a list of SQL views
 
 }
 
