@@ -19,6 +19,9 @@ import java.nio.file.Files
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import javax.ws.rs.core.MediaType
+import triplifier.services.DatasetsStore
+import javax.ws.rs.core.Context
+import javax.ws.rs.core.UriInfo
 
 @Api(tags = Array("R2RML editing"))
 @Path("/triplify")
@@ -132,6 +135,33 @@ class R2RMLDataset {
   }
 
   // TODO: a list of possible dataset
+
+  @GET
+  @Path("/datasets")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  def r2rml_datasets_list(
+    @Context uri_info: UriInfo) = {
+
+    println(s"\n\nURI INFO: ${uri_info.getAbsolutePath}")
+
+    val base_url = uri_info.getAbsolutePath
+
+    val conf = _configuration.conf
+    val store = new DatasetsStore(conf)
+
+    val _datasets = store
+      .datasetsNamesByGroup
+      .map { item =>
+        val sds = item._2
+        (item._1, sds.map(p => s"${base_url}/${p}.r2rml"))
+      }
+
+    Response
+      .ok()
+      .entity(_datasets)
+      .build()
+
+  }
 
   // TODO: a list of SQL views
 

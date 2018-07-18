@@ -23,13 +23,18 @@ import java.io.File
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.util.Try
+import scala.util.Failure
+import scala.collection.mutable.LinkedHashMap
 
+// TODO
 class DatasetsStore(default_configuration: Config) {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
   val r2rml_base_path: String = default_configuration.getString("r2rml.path")
-  val dir_path = Paths.get(r2rml_base_path)
+  val dir_path = Paths.get(r2rml_base_path).toAbsolutePath().normalize()
+
+  println("> CHECK > dir_path? " + dir_path)
 
   def datasetsPathsList() = {
 
@@ -39,14 +44,37 @@ class DatasetsStore(default_configuration: Config) {
 
   }
 
+  def datasetsNamesByGroup: Map[String, Seq[String]] = {
+
+    LinkedHashMap(
+      this.datasets
+        .groupBy { ds => ds.group }
+        .map(e => (e._1, e._2.map(_.path)))
+        .toStream: _*).toMap
+
+  }
+
   def datasets = {
 
-    datasetsPathsList.map { p =>
-
-      val local: String = p.toString().replace(r2rml_base_path.toString(), "")
-      new SingleDatasetStore(default_configuration, local)
-
-    }
+    datasetsPathsList
+      .map { p =>
+        p.toString()
+          .replace(dir_path.toString(), "")
+          .replace("\\", "/")
+          .replaceAll("[/]*(.*)", "$1")
+      }
+      .distinct
+      .map { local =>
+        Try { new SingleDatasetStore(default_configuration, local) }
+          .recoverWith {
+            case err =>
+              val msg = s"ignored path <${local}> for error:\n${err}"
+              logger.error(msg)
+              Failure { new RuntimeException(msg) }
+          }
+      }
+      .filterNot(_.isFailure)
+      .map(_.get.asInstanceOf[SingleDatasetStore])
 
   }
 
@@ -57,7 +85,7 @@ class DatasetsStore(default_configuration: Config) {
  *  TODO: review of DatasetHelper logic, refactorization
  *  TODO: DatasetsService
  */
-class SingleDatasetStore(default_configuration: Config, path: String) {
+class SingleDatasetStore(default_configuration: Config, val path: String) {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -66,6 +94,8 @@ class SingleDatasetStore(default_configuration: Config, path: String) {
 
   val r2rml_base_path: String = default_configuration.getString("r2rml.path")
   val rdf_dump_dir: String = default_configuration.getString("datasets.rdf.dump.path")
+
+  val group = path.replaceAll("(.*?)/.*", "$1")
 
   // each dataset will be related to an actual local path, from which the configs are loaded...
   val dataset_dir = Paths.get(r2rml_base_path, s"${path}").toAbsolutePath().normalize()
@@ -171,12 +201,26 @@ class SingleDatasetStore(default_configuration: Config, path: String) {
 
   }
 
+  /**
+   * given a dataset_dir, construct a list of all the available mappings
+   */
   def getR2RMLMappinglList(): Seq[(URI, String)] = {
     val r2rml_paths = FileStore.getPathList(dataset_dir).filter { f => f.toString().endsWith(".r2rml.ttl") }.toList
     val r2rmls = r2rml_paths.map { r2rml_path =>
       (r2rml_path.toUri(), readFile(r2rml_path).getOrElse("# no content"))
     }.toList
     r2rmls
+  }
+
+  def getMappingsList() = {
+
+    val list = this.getR2RMLMappinglList()
+      .map(_._1.toString())
+      .map { el => el.substring(el.lastIndexOf(path) + path.length() + 1) }
+      .map(_.replaceAll("(.*)\\.r2rml\\.ttl", "$1"))
+
+    Map(path -> list)
+
   }
 
   def getMetadata(): Option[String] = {
@@ -199,6 +243,10 @@ class SingleDatasetStore(default_configuration: Config, path: String) {
 
   }
 
+  override def toString() = {
+    s"""${r2rml_base_path}, ${path}"""
+  }
+
 }
 
 object MainSingleDatasetStore extends App {
@@ -214,12 +262,29 @@ object MainSingleDatasetStore extends App {
       println(path)
     }
 
-  fs.saveFile(Paths.get("../testing/another_one.r2rml.ttl"), "testing.....").get
+  //  fs.saveFile(Paths.get("../testing/another_one.r2rml.ttl"), "testing.....").get
 
-  new DatasetsStore(conf)
+  println("\n#### MAPPINGS?")
+  val mappings = fs.getMappingsList()
+  println(mappings.mkString("\n"))
 
 }
 
+object MainDatasetsStore extends App {
+
+  val conf = ConfigFactory.parseFile(new File("conf/triplifier.conf"))
+  val store = new DatasetsStore(conf)
+
+  store.datasets
+    .foreach { ds =>
+      println("\nDATASET: " + ds.group + " - " + ds.path)
+
+      val list = ds.getMappingsList().flatMap(_._2)
+
+      println(list)
+    }
+
+}
 
 
 
