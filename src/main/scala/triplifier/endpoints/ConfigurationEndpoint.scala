@@ -9,7 +9,6 @@ import io.swagger.annotations.Api
 import it.almawave.kb.http.providers.ConfigurationService
 import javax.ws.rs.core.Response
 import java.util.Date
-import triplifier.repository.MockRepo
 
 @Api(tags = Array("testing"))
 @Path("/configuration")

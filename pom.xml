@@ -228,11 +228,26 @@
 		<!-- </dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/eu.fusepool.p3.ext.de.fuberlin.wiwiss.silk/silk-core -->
+		<!-- <dependency> -->
+		<!-- <groupId>eu.fusepool.p3.ext.de.fuberlin.wiwiss.silk</groupId> -->
+		<!-- <artifactId>silk-core</artifactId> -->
+		<!-- <version>2.6.0</version> -->
+		<!-- </dependency> -->
+
+		<!-- https://mvnrepository.com/artifact/de.fuberlin.wiwiss.silk/silk-core -->
 		<dependency>
-			<groupId>eu.fusepool.p3.ext.de.fuberlin.wiwiss.silk</groupId>
+			<groupId>de.fuberlin.wiwiss.silk</groupId>
 			<artifactId>silk-core</artifactId>
-			<version>2.6.0</version>
+			<version>2.5.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/de.fuberlin.wiwiss.silk/silk-singlemachine -->
+		<dependency>
+			<groupId>de.fuberlin.wiwiss.silk</groupId>
+			<artifactId>silk-singlemachine</artifactId>
+			<version>2.5.3</version>
+		</dependency>
+
+
 
 	</dependencies>
 

@@ -8,10 +8,10 @@ import java.nio.file.Paths
 import javax.ws.rs.core.Context
 import javax.xml.ws.Service
 import javax.inject.Inject
-import triplifier.repository.MockRepo
 import org.slf4j.LoggerFactory
 import javax.ws.rs.ext.Provider
 import javax.ws.rs.ext.ContextResolver
+import repository.triplestore.MockRepo
 
 @Singleton
 @Path("conf://repository")

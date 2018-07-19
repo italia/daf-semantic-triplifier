@@ -10,7 +10,6 @@ import org.openrdf.query.QueryLanguage
 import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriter
 import javax.ws.rs.core.StreamingOutput
 import java.io.OutputStream
-import triplifier.repository.MockRepo
 import java.nio.file.Paths
 import javax.inject.Inject
 import javax.ws.rs.core.Context

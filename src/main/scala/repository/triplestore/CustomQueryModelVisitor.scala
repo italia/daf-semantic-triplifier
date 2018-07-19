@@ -1,4 +1,4 @@
-package triplifier.repository
+package repository.triplestore
 
 import org.openrdf.query.algebra.QueryModelVisitor
 

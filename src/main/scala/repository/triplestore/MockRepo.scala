@@ -1,4 +1,4 @@
-package triplifier.repository
+package repository.triplestore
 
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore

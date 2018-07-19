@@ -1,4 +1,4 @@
-package triplifier.repository
+package repository.triplestore
 
 import org.eclipse.rdf4j.sail.inferencer.util.RDFInferencerInserter
 import org.openrdf.repository.util.RDFInserter
