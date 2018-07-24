@@ -1,8 +1,4 @@
-package triplifier.interlinking
-
-import java.net.URLDecoder
-import java.io.File
-import de.fuberlin.wiwiss.silk.Silk
+package triplifier.interlinking.silk
 
 /**
  * CHECK: how to wrap silk in the most simple way

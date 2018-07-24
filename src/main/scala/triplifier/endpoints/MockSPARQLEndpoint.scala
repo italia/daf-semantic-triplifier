@@ -19,6 +19,8 @@ import io.swagger.models.parameters.BodyParameter
 import javax.ws.rs.FormParam
 import javax.ws.rs.Encoded
 import io.swagger.models.parameters.FormParameter
+import io.swagger.models.Operation
+import io.swagger.annotations.ApiOperation
 
 @Api(tags = Array("SPARQL"))
 @Path("/repository")
@@ -38,12 +40,13 @@ class MockSPARQLEndpoint {
   }
 
   @POST
+  @ApiOperation(
+    value = "sparql endpoint for testing",
+    notes = "this is a minimal sparql endpoint from in-memory data, for testing")
   @Path("/sparql")
   def sparql(
-    @DefaultValue("SELECT DISTINCT ?concept WHERE { ?s a ?concept }") query: String,
-    @DefaultValue("csv")@QueryParam("format") format:                        String) = {
-
-    //    println("\nMOCK2 @ " + mock_service.hashCode())
+    @BodyParameter @DefaultValue("SELECT DISTINCT ?concept WHERE { ?s a ?concept }") query:String,
+    @DefaultValue("csv")@QueryParam("format") format:                                      String) = {
 
     val sparql_results = new StreamingOutput {
       def write(out: OutputStream) {
