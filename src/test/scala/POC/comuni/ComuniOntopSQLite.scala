@@ -76,7 +76,7 @@ object MainOntopSQlite extends App {
   val db_name = "daf_comuni_test"
   Class.forName(db_driver)
 
-  val dsn = "jdbc:sqlite:C:/Users/Al.Serafini/repos/DAF/db/test_comuni.db"
+  val dsn = "jdbc:sqlite:C:/Users/a.mauro/IdeaProjects/daf-triplifier/db/test_comuni.db"
   val usr = "aserafini"
   val pwd = "openD4ti"
 
@@ -96,7 +96,7 @@ object MainOntopSQlite extends App {
 
   // -------------------------------------------------------------------------------
 
-  val r2rmlFile = new File("src/test/resources/r2rml/ex_01.r2rml.ttl").getAbsoluteFile;
+  val r2rmlFile = new File("src/test/resources/r2rml.old/ex_01.r2rml.ttl").getAbsoluteFile;
 
   val r2rmlModel = loadR2RML(r2rmlFile.toString());
 
