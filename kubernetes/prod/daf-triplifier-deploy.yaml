@@ -1,0 +1,38 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: daf-triplifier-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: daf-triplifier
+    spec:
+      imagePullSecrets:
+        - name: regsecret
+      containers:
+        - name: daf-triplifier
+          image: nexus.daf.teamdigitale.it/daf-triplifier:0.0.1
+          ports:
+            - containerPort: 7777
+          volumeMounts:
+            - name: glusterfsvol
+              readOnly: false
+              mountPath: /data
+              subPath: daf-triplifier
+            - name: security-manager-cert-volume
+              readOnly: true
+              mountPath: /triplifier/ssl_impala/impala.jks
+              subPath: impala.jks
+            - name: security-manager-cert-volume
+              readOnly: true
+              mountPath: /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/jssecacerts
+              subPath: jssecacerts
+      volumes:
+          - name: glusterfsvol
+            persistentVolumeClaim:
+              claimName: gluster-claim
+          - name: security-manager-cert-volume
+            secret:
+              secretName: security-manager-cert
