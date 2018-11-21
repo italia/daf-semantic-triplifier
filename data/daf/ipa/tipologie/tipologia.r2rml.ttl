@@ -12,9 +12,9 @@
 <VIEW_tipologia_amministrazioni> rr:sqlQuery """
 
 SELECT DISTINCT 
-ABS(FNV_HASH(tipologia_amm)) AS _TIPOLOGIA_AMMINISTRAZIONE_HASH,
-tipologia_amm AS _TIPOLOGIA_AMMINISTRAZIONE_DESCRIZIONE
-FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM 
+	AMM.tipologia_amm AS _TIPOLOGIA_AMMINISTRAZIONE_DESCRIZIONE
+	,AMM.`__tipologia_amministrazione_hash` AS _TIPOLOGIA_AMMINISTRAZIONE_HASH 
+FROM gove__amministrazione.daf_data_o_ipa_amministrazioni_view AS AMM 
 
 """
 .

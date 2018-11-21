@@ -12,31 +12,27 @@
 <VIEW_UOO_indirizzi> rr:sqlQuery """
 
 SELECT DISTINCT 
-UOO.cod_ou AS _UOO_CODICE 
-,UOO.des_ou AS _UOO_DESCRIZIONE 
-,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(UOO.indirizzo, '[-./,]', ' ')), '\\s+', '-')) AS _ADDRESS_ID
-,UOO.indirizzo AS _UOO_INDIRIZZO  
-,ISTAT.codice_comune_formato_numerico AS _COMUNE_CODICE 
-,ISTAT.denominazione_corrente AS _COMUNE_DENOMINAZIONE 
-,ISTAT.codice_regione AS _REGIONE_CODICE 
-,ISTAT.denominazione_regione AS _REGIONE_DENOMINAZIONE 
-,ISTAT.codice_provincia AS _PROVINCIA_CODICE 
-,ISTAT.denominazione_provincia AS _PROVINCIA_DENOMINAZIONE 
-,UOO._REGIONE_TXT
-FROM (
-	SELECT *
-	,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(regione, '[-./,]', ' ')), '\\s+', '-')) AS _REGIONE_TXT
-	FROM opendata.agid_o_unita_organizzative_stage_parquet
-) AS UOO
-JOIN (
-	SELECT * 
-	,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(denominazione_regione, '[-./,]', ' ')), '\\s+', '-')) AS _REGIONE_TXT
-	FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani
-) AS ISTAT 
+	UOO.cod_ou AS _UOO_CODICE 
+	,UOO.des_ou AS _UOO_DESCRIZIONE 
+	,UOO.__address_id AS _ADDRESS_ID
+	,UOO.indirizzo AS _UOO_INDIRIZZO  
+	,ISTAT.codice_comune_formato_numerico AS _COMUNE_CODICE 
+	,ISTAT.denominazione_in_italiano AS _COMUNE_DENOMINAZIONE 
+	,ISTAT.codice_regione AS _REGIONE_CODICE 
+	,ISTAT.denominazione_regione AS _REGIONE_DENOMINAZIONE 
+	,ISTAT.codice_provincia AS _PROVINCIA_CODICE 
+	,ISTAT.denominazione_provincia AS _PROVINCIA_DENOMINAZIONE 
+	,UOO.__regione_id
+FROM gove__amministrazione.daf_data_o_ipa_ou_view AS UOO
+JOIN gove__amministrazione.daf_data_o_istat_comuni_italiani_view AS ISTAT 
 ON(
-	UOO.comune=ISTAT.denominazione_corrente 
+	UOO.comune=ISTAT.denominazione_in_italiano 
 )
-WHERE(INSTR(UOO._REGIONE_TXT,ISTAT._REGIONE_TXT) != 0)
+WHERE(
+	INSTR(UOO.__regione_id,ISTAT.__regione_id) != 0
+	AND
+	ISTAT.denominazione_provincia != '-'
+)
 
 """
 .
@@ -46,7 +42,7 @@ WHERE(INSTR(UOO._REGIONE_TXT,ISTAT._REGIONE_TXT) != 0)
 rr:logicalTable <VIEW_UOO_indirizzi> ;
 
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/data/address/{'_ADDRESS_ID'}" ;
+	rr:template "https://w3id.org/italia/data/address/{'_COMUNE_CODICE'}#{'_ADDRESS_ID'}" ;
 	rr:class clvapit:Address ;
 ] ;
 

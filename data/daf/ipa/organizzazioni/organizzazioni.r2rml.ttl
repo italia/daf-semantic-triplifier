@@ -10,13 +10,13 @@
 <VIEW_Organizzazioni> rr:sqlQuery """
 
 SELECT DISTINCT 
-AMM.cod_amm AS _AMM_CODICE
-,AMM.acronimo AS _AMM_ACRONIMO
-,AMM.des_amm AS _AMM_DESCRIZIONE
-,ABS(FNV_HASH(AMM.tipologia_amm)) AS _TIPOLOGIA_AMMINISTRAZIONE_HASH
-,ABS(FNV_HASH(AMM.tipologia_istat)) AS _TIPOLOGIA_ISTAT_HASH
-,ABS(FNV_HASH(CONCAT(AMM.cogn_resp,AMM.nome_resp))) AS _RESPONSABILE_HASH 
-FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM
+	AMM.cod_amm AS _AMM_CODICE
+	,AMM.acronimo AS _AMM_ACRONIMO
+	,AMM.des_amm AS _AMM_DESCRIZIONE
+	,AMM.`__tipologia_amministrazione_hash` AS _TIPOLOGIA_AMMINISTRAZIONE_HASH
+	,AMM.`__tipologia_istat_hash` AS _TIPOLOGIA_ISTAT_HASH 
+	,AMM.`__responsabile_hash` AS _RESPONSABILE_HASH 
+FROM gove__amministrazione.daf_data_o_ipa_amministrazioni_view AS AMM
 
 """
 .

@@ -14,14 +14,14 @@
 <VIEW_AMM_responsabili> rr:sqlQuery """
 
 SELECT DISTINCT 
-AMM.titolo_resp AS _AMM_RESPONSABILE_TITOLO  
-,AMM.cod_amm AS _AMM_CODICE 
-,AMM.des_amm AS _AMM_DESCRIZIONE 
-,AMM.cogn_resp AS _RESPONSABILE_COGNOME 
-,AMM.nome_resp AS _RESPONSABILE_NOME 
-,ABS(FNV_HASH(CONCAT(AMM.cogn_resp,AMM.nome_resp))) AS _RESPONSABILE_HASH 
-,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AMM.titolo_resp, '[-./,]', ' ')), '\\s+', '-')) AS _AMM_RESPONSABILE_ID 
-FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM
+	AMM.titolo_resp AS _AMM_RESPONSABILE_TITOLO  
+	,AMM.cod_amm AS _AMM_CODICE 
+	,AMM.des_amm AS _AMM_DESCRIZIONE 
+	,AMM.cogn_resp AS _RESPONSABILE_COGNOME 
+	,AMM.nome_resp AS _RESPONSABILE_NOME 
+	,AMM.`__responsabile_hash` AS _RESPONSABILE_HASH
+	,AMM.`_amm_ruolo_id` AS _AMM_RESPONSABILE_ID 
+FROM gove__amministrazione.daf_data_o_ipa_amministrazioni_view AS AMM 
 
 """
 .

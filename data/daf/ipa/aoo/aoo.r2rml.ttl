@@ -12,14 +12,15 @@
 <VIEW_AOO> rr:sqlQuery """
 
 SELECT DISTINCT 
-AOO.cod_aoo AS _AOO_CODICE 
-,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AOO.cod_aoo, '[-./,]', ' ')), '\\s+', '-')) AS _AOO_ID 
-,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AOO.indirizzo, '[-./,]', ' ')), '\\s+', '-')) AS _ADDRESS_ID 
-,AOO.des_aoo AS _AOO_DESCRIZIONE 
-,AOO.dat_istituz AS _AOO_DATA_ISTITUZIONE 
-,AOO.indirizzo AS _AOO_INDIRIZZO 
-,AOO.cod_amm AS _AMM_CODICE
-FROM opendata.agid_o_aoo_stage_parquet AS AOO 
+	AOO.cod_aoo AS _AOO_CODICE 
+	,AOO.__aoo_id AS _AOO_ID 
+	,AOO.__regione_id AS _AOO_REGIONE_ID 
+	,AOO.__address_id AS _ADDRESS_ID 
+	,AOO.des_aoo AS _AOO_DESCRIZIONE 
+	,AOO.dat_istituz AS _AOO_DATA_ISTITUZIONE 
+	,AOO.indirizzo AS _AOO_INDIRIZZO 
+	,AOO.cod_amm AS _AMM_CODICE
+FROM gove__amministrazione.daf_data_o_ipa_aoo_view AS AOO 
 
 """
 .

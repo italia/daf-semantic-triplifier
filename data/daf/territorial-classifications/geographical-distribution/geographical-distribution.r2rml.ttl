@@ -15,13 +15,31 @@
 SELECT DISTINCT 
 	ISTAT.ripartizione_geografica AS _RIPARTIZIONE_GEOGRAFICA_NAME 
 	,LCASE(ISTAT.ripartizione_geografica) AS _RIPARTIZIONE_GEOGRAFICA_ID 
-FROM gove__amministrazione.daf_data_o_istat_comuni_italiani AS ISTAT  
+FROM gove__amministrazione.daf_data_o_istat_comuni_italiani_view AS ISTAT   
 
 """
 .
 
 
-# TODO: SKOS Concept Scheme
+<VIEW_ripartizioni-geografiche> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_regioni> ;
+
+rr:subjectMap [ 
+	rr:constant <https://w3id.org/italia/data/geographical-distribution> ;
+	rr:class skos:ConceptScheme ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate skos:hasTopConcept ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/data/geographical-distribution/{'_RIPARTIZIONE_GEOGRAFICA_ID'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.
+
 
 <TriplesMap_ripartizioni-geografiche> a rr:TriplesMapClass ;
 
@@ -38,9 +56,22 @@ rr:predicateObjectMap [
 ] ;
 
 rr:predicateObjectMap [ 
-	rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ; 
+	rr:predicate clvapit:hasIdentifier ; 
 	rr:objectMap [ 
 		rr:template "https://w3id.org/italia/data/identifiers/{'_RIPARTIZIONE_GEOGRAFICA_ID'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:hasRank ; 
+	rr:objectMap [ rr:constant 2 ; rr:datatype xsd:integer ] 
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank, skos:broader ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/countries/ITA" ;
 		rr:termType rr:IRI ;
 	] 
 ] ;

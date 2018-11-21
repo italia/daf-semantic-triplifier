@@ -12,33 +12,28 @@
 <VIEW_AMM_luoghi> rr:sqlQuery """
 
 SELECT DISTINCT 
-AMM.cod_amm AS _AMM_CODICE 
-,AMM.des_amm AS _AMM_DESCRIZIONE 
-,ISTAT.codice_comune_formato_numerico AS _COMUNE_CODICE 
-,ISTAT.denominazione_corrente AS _COMUNE_DENOMINAZIONE 
-,ISTAT.codice_regione AS _REGIONE_CODICE 
-,ISTAT.denominazione_regione AS _REGIONE_DENOMINAZIONE 
-,ISTAT.codice_provincia AS _PROVINCIA_CODICE 
-,ISTAT.denominazione_provincia AS _PROVINCIA_DENOMINAZIONE 
-,AMM._REGIONE_TXT
-FROM (
-	SELECT *
-	,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(regione, '[-./,]', ' ')), '\\s+', '-')) AS _REGIONE_TXT
-	FROM opendata.agid_o_amministrazioni_stage_parquet
-) AS AMM
-JOIN (
-	SELECT * 
-	,LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(denominazione_regione, '[-./,]', ' ')), '\\s+', '-')) AS _REGIONE_TXT
-	FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani
-) AS ISTAT 
-ON(
-	AMM.comune=ISTAT.denominazione_corrente 
+	AMM.cod_amm AS _AMM_CODICE 
+	,AMM.des_amm AS _AMM_DESCRIZIONE 
+	,TRIM(ISTAT.codice_comune_formato_numerico) AS _COMUNE_CODICE 
+	,ISTAT.denominazione_in_italiano AS _COMUNE_DENOMINAZIONE 
+	,ISTAT.codice_regione AS _REGIONE_CODICE 
+	,ISTAT.denominazione_regione AS _REGIONE_DENOMINAZIONE 
+	,ISTAT.codice_provincia AS _PROVINCIA_CODICE 
+	,ISTAT.denominazione_provincia AS _PROVINCIA_DENOMINAZIONE 
+	,ANPR.`__data_istituzione` AS _DATA_ISTITUZIONE 
+FROM gove__amministrazione.daf_data_o_ipa_amministrazioni_view AS AMM 
+JOIN gove__amministrazione.daf_data_o_istat_comuni_italiani_view AS ISTAT 
+ON(AMM.comune=ISTAT.denominazione_in_italiano)
+JOIN gove__amministrazione.daf_data_o_anpr_comuni_italiani_view AS ANPR 
+ON (TRIM(ISTAT.codice_comune_formato_numerico)=ANPR.codistat)
+WHERE(
+	INSTR(AMM.__regione_id,ISTAT.__regione_id) != 0
+	AND 
+	ISTAT.denominazione_provincia != '-' 
 )
-WHERE(INSTR(AMM._REGIONE_TXT,ISTAT._REGIONE_TXT) != 0)
 
 """
 .
-
 
 <TriplesMap_AMM_luoghi> a rr:TriplesMapClass ;
 
@@ -57,23 +52,24 @@ rr:predicateObjectMap [
 rr:predicateObjectMap [ 
 	rr:predicate covapit:hasSpatialCoverage ; 
 	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_COMUNE_CODICE'}" ;
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/cities/{'_COMUNE_CODICE'}-({'_DATA_ISTITUZIONE'})" ;
 		rr:termType rr:IRI ;
 	] 
 ] ;
-rr:predicateObjectMap [ 
-	rr:predicate covapit:hasSpatialCoverage ; 
-	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_PROVINCIA_CODICE'}" ;
-		rr:termType rr:IRI ;
-	] 
-] ;
-rr:predicateObjectMap [ 
-	rr:predicate covapit:hasSpatialCoverage ; 
-	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_REGIONE_CODICE'}" ;
-		rr:termType rr:IRI ;
-	] 
-] ;
+
+# rr:predicateObjectMap [ 
+# 	rr:predicate covapit:hasSpatialCoverage ; 
+# 	rr:objectMap [ 
+# 		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_PROVINCIA_CODICE'}" ;
+# 		rr:termType rr:IRI ;
+# 	] 
+# ] ;
+# rr:predicateObjectMap [ 
+# 	rr:predicate covapit:hasSpatialCoverage ; 
+# 	rr:objectMap [ 
+# 		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_REGIONE_CODICE'}" ;
+# 		rr:termType rr:IRI ;
+# 	] 
+# ] ;
 
 .

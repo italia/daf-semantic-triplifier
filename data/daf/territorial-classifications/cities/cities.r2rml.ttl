@@ -12,33 +12,23 @@
 
 <VIEW_comuni> rr:sqlQuery """
 
---SELECT DISTINCT
 SELECT 
-	--ISTAT.denominazione_in_italiano AS _NOME_ISTAT    
 	ANPR.denominazione_it AS _NOME    
 	,ANPR.stato AS _STATO 
 	,ANPR.codcatastale AS _CODICE_CATASTALE 
 	,ISTAT.codice_provincia AS _CODICE_PROVINCIA 
 	,TRIM(ISTAT.codice_comune_formato_numerico) AS _CODICE_ISTAT
 	,TRIM(ISTAT.progressivo_comune) AS _CODICE_PROGRESSIVO
-	,ISTAT.ripartizione_geografica AS _RIPARTIZIONE_GEOGRAFICA 
-	--,from_unixtime(unix_timestamp(ANPR.dataistituzione, "dd/MM/yyyy"), "yyyy-MM-dd") AS _DATA_ISTITUZIONE
-	--,from_unixtime(unix_timestamp(ANPR.datacessazione, "dd/MM/yyyy"), "yyyy-MM-dd") AS _DATA_CESSAZIONE
-	--,from_unixtime(unix_timestamp(ANPR.dataultimoagg, "dd/MM/yyyy"), "yyyy-MM-dd") AS _DATA_AGGIORNAMENTO
-	,dataistituzione AS _DATA_ISTITUZIONE
-	,datacessazione AS _DATA_CESSAZIONE
-	,dataultimoagg AS _DATA_AGGIORNAMENTO 
-FROM gove__amministrazione.daf_data_o_anpr_comuni_italiani AS ANPR 
-LEFT JOIN gove__amministrazione.daf_data_o_istat_comuni_italiani AS ISTAT  
+	,ISTAT.ripartizione_geografica AS _RIPARTIZIONE_GEOGRAFICA
+	,ANPR.`__data_istituzione` AS _DATA_ISTITUZIONE
+	,ANPR.`__data_cessazione` AS _DATA_CESSAZIONE
+	,ANPR.`__data_aggiornamento` AS _DATA_AGGIORNAMENTO 
+FROM gove__amministrazione.daf_data_o_anpr_comuni_italiani_view AS ANPR 
+LEFT JOIN gove__amministrazione.daf_data_o_istat_comuni_italiani_view AS ISTAT  
 ON (TRIM(ISTAT.codice_comune_formato_numerico)=ANPR.codistat)
--- ORDER BY _NOME
-
 
 """
 .
-
-
-# TODO: add UDF for time / date
 
 
 <TriplesMap_DatasetConceptScheme> a rr:TriplesMapClass ;
@@ -88,11 +78,11 @@ rr:subjectMap [
 ] ;
 rr:predicateObjectMap [ 
 	rr:predicate tiapit:startTime ; 
-	rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; ] # CHECK: rr:datatype xsd:date ;
+	rr:objectMap [ rr:column "_DATA_ISTITUZIONE" ; rr:datatype xsd:date ] 
 ] ;
 rr:predicateObjectMap [ 
 	rr:predicate tiapit:endTime ; 
-	rr:objectMap [ rr:column "_DATA_CESSAZIONE" ; ] # CHECK: rr:datatype xsd:date ;
+	rr:objectMap [ rr:column "_DATA_CESSAZIONE" ; rr:datatype xsd:date ] 
 ] ;
 
 .    
@@ -164,7 +154,7 @@ rr:subjectMap [
 ] ;
 
 rr:predicateObjectMap [ 
-	rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank ; 
+	rr:predicate clvapit:situatedWithin, clvapit:hasDirectHigherRank, skos:broader ; 
 	rr:objectMap [ 
 		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_CODICE_PROVINCIA'}" ;
 		rr:termType rr:IRI ;
@@ -173,7 +163,7 @@ rr:predicateObjectMap [
 
 rr:predicateObjectMap [ 
 	rr:predicate clvapit:hasRank ; 
-	rr:objectMap [ rr:constant 4 ; rr:datatype xsd:integer ] 
+	rr:objectMap [ rr:constant 5 ; rr:datatype xsd:integer ] 
 ] ;
 
 rr:predicateObjectMap [ 
@@ -213,7 +203,7 @@ rr:predicateObjectMap [
 
 rr:predicateObjectMap [ 
 	rr:predicate tiapit:modified ; 
-	rr:objectMap [ rr:column "_DATA_AGGIORNAMENTO" ; ] # CHECK : rr:datatype xsd:date ;
+	rr:objectMap [ rr:column "_DATA_AGGIORNAMENTO" ; rr:datatype xsd:date ] 
 ] ;
 
 .

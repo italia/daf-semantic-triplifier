@@ -11,10 +11,9 @@
 <VIEW_AMM_ruoli> rr:sqlQuery """
 
 SELECT DISTINCT 
-AMM.titolo_resp AS _AMM_RUOLO_DESCRIZIONE,
-LCASE(REGEXP_REPLACE(TRIM(REGEXP_REPLACE(AMM.titolo_resp, '[-./,]', ' ')), '\\s+', '-')) AS _AMM_RUOLO_ID   
-FROM opendata.agid_o_amministrazioni_stage_parquet AS AMM 
---ORDER BY AMM.titolo_resp 
+	AMM.titolo_resp AS _AMM_RUOLO_DESCRIZIONE
+	,AMM.`__amm_responsabile_id` AS _AMM_RUOLO_ID 
+FROM gove__amministrazione.daf_data_o_ipa_amministrazioni_view AS AMM 
 
 """
 .
