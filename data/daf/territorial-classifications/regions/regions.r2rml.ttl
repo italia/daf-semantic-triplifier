@@ -11,11 +11,12 @@
 
 <VIEW_regioni> rr:sqlQuery """
 
-SELECT 
+SELECT  
 	codice_regione AS _CODICE_REGIONE 
 	,denominazione_regione AS _NOME_REGIONE 
 	,codice_nuts2_2006 AS _NUTS2  
-FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani
+FROM gove__amministrazione.daf_data_o_istat_comuni_italiani
+ORDER BY codice_regione 
 
 """
 .
@@ -45,7 +46,7 @@ rr:predicateObjectMap [
 rr:logicalTable <VIEW_regioni> ;
 
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/cr-{'_CODICE_REGIONE'}" ;
+	rr:template "https://w3id.org/italia/data/identifiers/cr-{'_CODICE_REGIONE'}" ;
 	rr:class clvapit:Identifier ;
 ] ;
 rr:predicateObjectMap [ 
@@ -65,7 +66,7 @@ rr:logicalTable <VIEW_regioni> ;
 	
 rr:subjectMap [ 
 	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/regions/{'_CODICE_REGIONE'}" ;
-	rr:class clvapit:Feature, clvapit:Region, clvapit:AddressComponent, clvapit:NamedAddressComponent , skos:Concept ;
+	rr:class clvapit:Feature, clvapit:Region, clvapit:AdminUnitComponent, skos:Concept ;
 ] ;
 
 rr:predicateObjectMap [ 
@@ -81,7 +82,7 @@ rr:predicateObjectMap [
 rr:predicateObjectMap [ 
 	rr:predicate clvapit:hasIdentifier ; 
 	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/cr-{'_CODICE_REGIONE'}" ;
+		rr:template "https://w3id.org/italia/data/identifiers/cr-{'_CODICE_REGIONE'}" ;
 		rr:termType rr:IRI ;
 	] 
 ] ;

@@ -13,7 +13,7 @@ spec:
         - name: regsecret
       containers:
         - name: daf-triplifier
-          image: nexus.teamdigitale.test/daf-triplifier:0.0.2
+          image: nexus.teamdigitale.test/daf-triplifier:0.0.4
           ports:
             - containerPort: 7777
           volumeMounts:

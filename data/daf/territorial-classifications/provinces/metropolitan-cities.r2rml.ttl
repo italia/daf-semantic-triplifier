@@ -13,28 +13,47 @@
 <VIEW_citta_metropolitane> rr:sqlQuery """
 
 SELECT 
-	codice_provincia AS _CODICE_PROVINCIA 
-	,codice_citta_metropolitana AS _CODICE_CITTA_METROPOLITANA  
-	,codice_regione AS _CODICE_REGIONE 
-	,denominazione_regione AS _NOME_REGIONE 
-	,denominazione_provincia AS _NOME_PROVINCIA 
-	,denominazione_citta_metropolitana AS _NOME_CITTA_METROPOLITANA 
-	,sigla_automobilistica AS _SIGLA_AUTOMOBILISTICA
-	,codice_nuts2_2006 AS _NUTS2
-	,codice_nuts3_2006 AS _NUTS3
-	,*
-FROM gove__amministrazione.default_org_o_istat_elenco_comuni_italiani
-WHERE (denominazione_provincia = '-' AND denominazione_citta_metropolitana != '-') 
+	ISTAT.codice_provincia AS _CODICE_PROVINCIA 
+	,ISTAT.codice_citta_metropolitana AS _CODICE_CITTA_METROPOLITANA 
+	,ISTAT.codice_regione AS _CODICE_REGIONE 
+--	,ISTAT.denominazione_regione AS _NOME_REGIONE 
+--	,ISTAT.denominazione_provincia AS _NOME_PROVINCIA 
+	,ISTAT.denominazione_citta_metropolitana AS _NOME_CITTA_METROPOLITANA 
+	,ISTAT.sigla_automobilistica AS _SIGLA_AUTOMOBILISTICA
+	,ISTAT.codice_nuts2_2006 AS _NUTS2
+	,ISTAT.codice_nuts3_2006 AS _NUTS3 
+FROM gove__amministrazione.daf_data_o_istat_comuni_italiani AS ISTAT 
+WHERE (ISTAT.denominazione_provincia = '-' AND ISTAT.denominazione_citta_metropolitana != '-') 
 
 """
 .
+
+<TriplesMap_DatasetConceptSchemeCittaMetropolitane> a rr:TriplesMapClass ;
+
+rr:logicalTable <VIEW_citta_metropolitane> ;
+
+rr:subjectMap [ 
+	rr:constant <https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces> ;
+	rr:class skos:ConceptScheme ;
+] ;
+
+rr:predicateObjectMap [ 
+	rr:predicate skos:hasTopConcept ; 
+	rr:objectMap [ 
+		rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_CODICE_CITTA_METROPOLITANA'}" ;
+		rr:termType rr:IRI ;
+	] 
+] ;
+
+.
+
 
 <TriplesMap_CittaMetropolitana> a rr:TriplesMapClass ;
 
 rr:logicalTable <VIEW_citta_metropolitane> ;
 
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-citta-metropolitana/{'_CODICE_CITTA_METROPOLITANA'}" ;
+	rr:template "https://w3id.org/italia/data/identifiers/codice-citta-metropolitana/{'_CODICE_CITTA_METROPOLITANA'}" ;
 	rr:class clvapit:Identifier ;
 ] ;
 rr:predicateObjectMap [ 
@@ -53,14 +72,14 @@ rr:predicateObjectMap [
 rr:logicalTable <VIEW_citta_metropolitane> ;
 	
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_CODICE_PROVINCIA'}" ;
-	rr:class clvapit:Province, clvapit:Region, clvapit:AddressComponent, clvapit:NamedAddressComponent , skos:Concept ;
+	rr:template "https://w3id.org/italia/controlled-vocabulary/territorial-classifications/provinces/{'_CODICE_CITTA_METROPOLITANA'}" ;
+	rr:class skos:Concept, clvapit:Province, clvapit:AdminUnitComponent, clvapit:Feature ;
 ] ;
 
 rr:predicateObjectMap [ 
 	rr:predicate clvapit:hasIdentifier ; 
 	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/codice-citta-metropolitana/{'_CODICE_CITTA_METROPOLITANA'}" ;
+		rr:template "https://w3id.org/italia/data/identifiers/codice-citta-metropolitana/{'_CODICE_CITTA_METROPOLITANA'}" ;
 		rr:termType rr:IRI ;
 	] 
 ] ;
@@ -91,7 +110,7 @@ rr:predicateObjectMap [
 rr:predicateObjectMap [ 
 	rr:predicate clvapit:hasIdentifier ; 
 	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/identifiers/sigla-automobilistica/{'_SIGLA_AUTOMOBILISTICA'}" ;
+		rr:template "https://w3id.org/italia/data/identifiers/sigla-automobilistica/{'_SIGLA_AUTOMOBILISTICA'}" ;
 		rr:termType rr:IRI ;
 	] 
 ] ;

@@ -25,6 +25,7 @@ object MainHTTPTriplifier extends App {
 
   val conf = ConfigFactory
     .parseFile(Paths.get("./conf/triplifier.conf").toAbsolutePath().normalize().toFile())
+    //.parseFile(Paths.get("./conf_prod/triplifier.conf").toAbsolutePath().normalize().toFile())
     .resolve()
 
   val http = HTTP(conf)
