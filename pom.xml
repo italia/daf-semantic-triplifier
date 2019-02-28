@@ -313,33 +313,7 @@
 
 	</build>
 
-	<repositories>
-	
-	<!-- 
-	<repository>
-		<id>mvn-local</id>
-		<url>file:./mvn-repo/</url>
-		<releases>
-			<enabled>true</enabled>
-		</releases>
-		<snapshots>
-			<enabled>true</enabled>
-		</snapshots>
-	</repository>
-	
-	<repository>
-		<id>central</id>
-		<url>http://repo1.maven.org/maven2</url>
-		<releases>
-			<enabled>true</enabled>
-		</releases>
-		<snapshots>
-			<enabled>true</enabled>
-		</snapshots>
-	</repository>    
-	-->
-	
-	</repositories>
+	<repositories></repositories>
 
 
 </project>
