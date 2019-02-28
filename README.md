@@ -13,12 +13,22 @@ The RDF processor used is [Ontop](https://ontop.inf.unibz.it/), which implements
 the `ssl_impala` folder should be created under the root folder of the project, and should contain the following files:
 
 ```bash
-├───ssl_impala
-│       jssecacerts
-│       master-impala.jks
-│       master-impala.pem
+├──ssl_impala
+│    jssecacerts
+│      master-impala.jks
+│      master-impala.pem
 ```
 
+**NOTE** (dependencies)
+
+this project uses third-party dependencies, that were included under the local `/lib` folder (there is currently no public available maven repository for the DAF components).
+
+```bash
+├──/lib
+│    ImpalaJDBC41.jar                   (required for Impala)
+│    TCLIServiceClient.jar              (required for Impala)
+│    http-api-jersey-0.2.0-SNAPSHOT.jar (uber jar)
+```
 
 * * *
 
@@ -107,10 +117,9 @@ TODO:
 
 mvn clean package
 
-java -cp "target/target/triplifier-0.0.4.jar;target/libs/*" triplifier.main.MainHTTPTriplifier
+java -cp "target/triplifier-0.0.4.jar;target/libs/*" triplifier.main.MainHTTPTriplifier
 
 ```
-
 
 * * *
 
@@ -125,11 +134,4 @@ java -cp "target/target/triplifier-0.0.4.jar;target/libs/*" triplifier.main.Main
 Ideally we could imagine having some specific microservices:
 + one for handling merging of RDF, and direct publication
 + one for creating relations between the current datasource and an external target, using silk or duke
-
-
-
-
-
-
-
 

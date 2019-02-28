@@ -211,8 +211,10 @@
 			<groupId>it.almawave.opendata.web</groupId>
 			<artifactId>http-api-jersey</artifactId>
 			<version>0.2.0-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/http-api-jersey-0.2.0-SNAPSHOT.jar</systemPath>
 		</dependency>
-
+		
 		<!-- duke -->
 		<dependency>
 			<groupId>no.priv.garshol.duke</groupId>
@@ -306,12 +308,38 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 		</plugins>
 
 	</build>
 
-	<repositories></repositories>
+	<repositories>
+	
+	<!-- 
+	<repository>
+		<id>mvn-local</id>
+		<url>file:./mvn-repo/</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>true</enabled>
+		</snapshots>
+	</repository>
+	
+	<repository>
+		<id>central</id>
+		<url>http://repo1.maven.org/maven2</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>true</enabled>
+		</snapshots>
+	</repository>    
+	-->
+	
+	</repositories>
 
 
 </project>
