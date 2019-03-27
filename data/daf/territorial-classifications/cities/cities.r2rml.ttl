@@ -73,7 +73,7 @@ rr:predicateObjectMap [
 rr:logicalTable <VIEW_comuni> ;
 
 rr:subjectMap [ 
-	rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
+	rr:template "https://w3id.org/italia/data/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
 	rr:class tiapit:TimeInterval ;
 ] ;
 rr:predicateObjectMap [ 
@@ -196,7 +196,7 @@ rr:predicateObjectMap [
 rr:predicateObjectMap [ 
 	rr:predicate clvapit:hasSOValidity ; 
 	rr:objectMap [ 
-		rr:template "https://w3id.org/italia/controlled-vocabulary/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
+		rr:template "https://w3id.org/italia/data/time-intervals/({'_DATA_ISTITUZIONE'})-({'_DATA_CESSAZIONE'})" ;
 		rr:termType rr:IRI ;
 	] 
 ] ;
