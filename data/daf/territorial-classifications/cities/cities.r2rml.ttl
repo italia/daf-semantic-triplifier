@@ -163,7 +163,7 @@ rr:predicateObjectMap [
 
 rr:predicateObjectMap [ 
 	rr:predicate clvapit:hasRank ; 
-	rr:objectMap [ rr:constant 5 ; rr:datatype xsd:integer ] 
+	rr:objectMap [ rr:constant 4 ; rr:datatype xsd:integer ] 
 ] ;
 
 rr:predicateObjectMap [ 
