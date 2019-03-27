@@ -25,7 +25,7 @@ SELECT
 	,ANPR.`__data_aggiornamento` AS _DATA_AGGIORNAMENTO 
 FROM gove__amministrazione.daf_data_o_anpr_comuni_italiani_view AS ANPR 
 LEFT JOIN gove__amministrazione.daf_data_o_istat_comuni_italiani_view AS ISTAT  
-ON (TRIM(ISTAT.codice_comune_formato_numerico)=ANPR.codistat)
+ON (TRIM(ISTAT.codice_comune_formato_alfanumerico)=ANPR.codistat)
 
 """
 .
