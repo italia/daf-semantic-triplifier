@@ -214,7 +214,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/http-api-jersey-0.3.0-SNAPSHOT.jar</systemPath>
 		</dependency>
-		
+
 		<!-- duke -->
 		<dependency>
 			<groupId>no.priv.garshol.duke</groupId>
@@ -223,23 +223,32 @@
 			<!-- <version>1.3-SNAPSHOT</version> -->
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.xbib.jdbc</groupId> -->
-		<!-- <artifactId>jdbc-driver-csv</artifactId> -->
-		<!-- <version>1.2.0</version> -->
-		<!-- </dependency> -->
-
-		<!-- https://mvnrepository.com/artifact/eu.fusepool.p3.ext.de.fuberlin.wiwiss.silk/silk-core -->
-		<!-- <dependency> -->
-		<!-- <groupId>eu.fusepool.p3.ext.de.fuberlin.wiwiss.silk</groupId> -->
-		<!-- <artifactId>silk-core</artifactId> -->
-		<!-- <version>2.6.0</version> -->
-		<!-- </dependency> -->
-
-		<!-- SILK TEST <dependency> <groupId>de.fuberlin.wiwiss.silk</groupId> 
-			<artifactId>silk-core</artifactId> <version>2.5.3</version> </dependency> 
-			<dependency> <groupId>de.fuberlin.wiwiss.silk</groupId> <artifactId>silk-singlemachine</artifactId> 
-			<version>2.5.3</version> </dependency> -->
+		<!-- jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.8.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.8.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-scala_2.11</artifactId>
+			<version>2.8.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-csv</artifactId>
+			<version>2.8.9</version>
+		</dependency>
 
 
 	</dependencies>
@@ -308,7 +317,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
 
 	</build>
