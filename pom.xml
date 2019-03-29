@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>triplifier</groupId>
 	<artifactId>triplifier</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 
 
 	<name>maven-scala-java</name>
@@ -210,9 +210,9 @@
 		<dependency>
 			<groupId>it.almawave.opendata.web</groupId>
 			<artifactId>http-api-jersey</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>0.3.0-SNAPSHOT</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/http-api-jersey-0.2.0-SNAPSHOT.jar</systemPath>
+			<systemPath>${project.basedir}/lib/http-api-jersey-0.3.0-SNAPSHOT.jar</systemPath>
 		</dependency>
 		
 		<!-- duke -->

@@ -117,7 +117,11 @@ TODO:
 
 mvn clean package
 
-java -cp "target/triplifier-0.0.4.jar;target/libs/*" triplifier.main.MainHTTPTriplifier
+# win
+java -cp "target/triplifier-0.0.5.jar;target/libs/*" triplifier.main.MainHTTPTriplifier
+
+# *nix
+java -cp "target/triplifier-0.0.5.jar:target/libs/*" triplifier.main.MainHTTPTriplifier
 
 ```
 
