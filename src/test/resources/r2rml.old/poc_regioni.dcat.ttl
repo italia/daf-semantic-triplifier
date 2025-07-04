@@ -53,7 +53,7 @@
       dct:description			"Questa è la distribuzione RDF/Turtle del dataset Linked Open Data del vocabolario controllato sulle licenze"@it , "This is the distribution in RDF/turtle of the Linked Open Dataset of the license controlled vocabulary "@en ;
       dct:format 				<http://publications.europa.eu/resource/authority/file-type/RDF_TURTLE> ;
       dct:license <http://w3id.org/italia/controlled-vocabulary/licences/A21_CCBY40> ;
-      dcat:downloadURL		<https://raw.githubusercontent.com/italia/daf-ontologie-vocabolari-controllati/master/VocabolariControllati/licences/licences.ttl> ;
-      dcat:accessURL 			<https://raw.githubusercontent.com/italia/daf-ontologie-vocabolari-controllati/master/VocabolariControllati/licences> ;
+      dcat:downloadURL		<https://raw.githubusercontent.com/italia/dati-semantic-assets/master/VocabolariControllati/licences/licences.ttl> ;
+      dcat:accessURL 			<https://raw.githubusercontent.com/italia/dati-semantic-assets/master/VocabolariControllati/licences> ;
 .
  
